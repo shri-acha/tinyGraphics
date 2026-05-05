@@ -44,7 +44,7 @@ int renderLine(frameBuffer *fb, int x1, int y1, int x2, int y2) {
         D = D + 2 * delta_y;
       }
     }
-  }else{
+  } else {
     D = 2 * delta_x - delta_y;
     for (int i = y1; i <= y2; i++) {
       renderPoint(fb, x, i);
@@ -56,5 +56,58 @@ int renderLine(frameBuffer *fb, int x1, int y1, int x2, int y2) {
       }
     }
   }
+  return 0;
+}
+
+int renderOctant(frameBuffer *fb, int x, int y, int r) {
+  int x1 = r;
+  int y1 = 0;
+  float t1 = r << 4;
+
+  while (x1 > y1) {
+
+    renderPoint(fb, x + x1, y + y1);
+    renderPoint(fb, x - x1, y + y1);
+    renderPoint(fb, x + x1, y - y1);
+    renderPoint(fb, x - x1, y - y1);
+
+    y1++;
+    t1 += y1;
+    float t2 = t1 - x1;
+    if (t2 >= 0) {
+      t1 = t2;
+      x1--;
+    }
+  }
+
+  x1 = 0;
+  y1 = r;
+  t1 = r << 4;
+
+  while (x1 < y1) {
+
+    renderPoint(fb, x + x1, y + y1);
+    renderPoint(fb, x - x1, y + y1);
+    renderPoint(fb, x + x1, y - y1);
+    renderPoint(fb, x - x1, y - y1);
+
+    x1++;
+    t1 += y1;
+    float t2 = t1 - x1;
+    if (t2 >= 0) {
+      t1 = t2;
+      y1--;
+    }
+  }
+  return 0;
+}
+
+int renderCircle(frameBuffer *fb, int x, int y, int r) {
+
+  /*   .
+   * (   )
+   *   .
+   * */
+  renderOctant(fb, x, y, r);
   return 0;
 }
