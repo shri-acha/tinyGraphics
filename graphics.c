@@ -9,9 +9,9 @@ int get_index(frameBuffer *fb, int x, int y) {
   return (y - 1) * fb->width + (x - 1);
 }
 
-frameBuffer* createFrameBuffer(int width, int height) {
-  uint16_t* buffer = calloc(width*height,sizeof(pixelBuffer));
-  frameBuffer* fb = (frameBuffer *) malloc(sizeof(frameBuffer)); 
+frameBuffer *createFrameBuffer(int width, int height) {
+  uint16_t *buffer = calloc(width * height, sizeof(pixelBuffer));
+  frameBuffer *fb = (frameBuffer *)malloc(sizeof(frameBuffer));
   return fb;
 }
 
@@ -30,15 +30,30 @@ int renderLine(frameBuffer *fb, int x1, int y1, int x2, int y2) {
   }
   float delta_x = x2 - x1;
   float delta_y = y2 - y1;
-  float D = 2 * delta_y - delta_x;
+  float D = 0;
   float y = y1;
-  for (int i = x1; i <= x2; i++) {
-    renderPoint(fb, i, y);
-    if (D > 0) {
-      y++;
-      D +=(2 * (delta_y - delta_x));
-    } else {
-      D = D + 2 * delta_y;
+  float x = x1;
+  if (delta_x > delta_y) {
+    D = 2 * delta_y - delta_x;
+    for (int i = x1; i <= x2; i++) {
+      renderPoint(fb, i, y);
+      if (D > 0) {
+        y++;
+        D += (2 * (delta_y - delta_x));
+      } else {
+        D = D + 2 * delta_y;
+      }
+    }
+  }else{
+    D = 2 * delta_x - delta_y;
+    for (int i = y1; i <= y2; i++) {
+      renderPoint(fb, x, i);
+      if (D > 0) {
+        x++;
+        D += (2 * (delta_x - delta_y));
+      } else {
+        D = D + 2 * delta_x;
+      }
     }
   }
   return 0;
