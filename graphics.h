@@ -1,7 +1,6 @@
-#include <cstdint>
 #include <stdint.h>
 
-typedef struct { uint16_t literal; } Color; // 0000(R) 0000(G) 0000(B) 0000(A)
+typedef struct { uint16_t literal; } Color; // 00000(R) 000000(G) 00000(B)
 
 typedef struct
 __attribute__((__packed__))
@@ -30,3 +29,9 @@ int renderCircle(frameBuffer *fb, int x, int y, int r);
 
 /*Returns an equivalent index of (x,y) in a linear buffer*/
 int get_index(frameBuffer *fb, int x, int y);
+
+/*Returns an instance of frameBuffer with width*height*/
+frameBuffer *createFrameBuffer(int width, int height);
+
+/*Destroys an instance of the frameBuffer*/
+int destroyFrameBuffer(frameBuffer* fb);

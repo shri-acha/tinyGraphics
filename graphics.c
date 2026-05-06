@@ -10,8 +10,11 @@ int get_index(frameBuffer *fb, int x, int y) {
 }
 
 frameBuffer *createFrameBuffer(int width, int height) {
-  uint16_t *buffer = calloc(width * height, sizeof(pixelBuffer));
+  pixelBuffer* buffer = calloc(width * height, sizeof(pixelBuffer));
   frameBuffer *fb = (frameBuffer *)malloc(sizeof(frameBuffer));
+  fb->height = height;
+  fb->width = width;
+  fb->buffer = buffer;
   return fb;
 }
 
@@ -19,7 +22,7 @@ int renderPoint(frameBuffer *fb, int x, int y) {
   if (x > fb->width || y > fb->height || x < 0 || y < 0) {
     return -1;
   }
-  fb->buffer[get_index(fb, x, y)].intensity = 1;
+  fb->buffer[get_index(fb, x, y)].color.literal = (uint16_t) 0xFFFFFFFFFFFFFFFF;
   return 0;
 }
 
@@ -83,5 +86,11 @@ int renderCircle(frameBuffer *fb, int x, int y, int r) {
       x1--;
     }
   }
+  return 0;
+}
+
+int destroyFrameBuffer(frameBuffer* fb) {
+  free(fb->buffer);
+  free(fb);
   return 0;
 }
