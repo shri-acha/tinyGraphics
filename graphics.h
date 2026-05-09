@@ -1,10 +1,10 @@
 #include <stdint.h>
 
-typedef struct { uint16_t literal; } Color; // 00000(R) 000000(G) 00000(B)
+typedef struct {
+  uint16_t literal;
+} Color; // 00000(R) 000000(G) 00000(B)
 
-typedef struct
-__attribute__((__packed__))
-{
+typedef struct __attribute__((__packed__)) {
   Color color;
 } pixelBuffer;
 
@@ -27,11 +27,21 @@ int renderLine(frameBuffer *fb, int x1, int y1, int x2, int y2);
  */
 int renderCircle(frameBuffer *fb, int x, int y, int r);
 
+/*
+ * Renders a circle of radius r with center at (x,y) rotated about the central axis through its center at theta degrees.
+ * Uses Jesko's method to reduce the number of overall operations,
+ * optimizing for low performance systems
+ */
+int renderAngledCircle(frameBuffer *fb, int x, int y, int r, float theta);
+
 /*Returns an equivalent index of (x,y) in a linear buffer*/
 int get_index(frameBuffer *fb, int x, int y);
+
+/*Flushes the pixelBuffer data*/
+int flushPixelBuffer(pixelBuffer *pb, int width, int height);
 
 /*Returns an instance of frameBuffer with width*height*/
 frameBuffer *createFrameBuffer(int width, int height);
 
 /*Destroys an instance of the frameBuffer*/
-int destroyFrameBuffer(frameBuffer* fb);
+int destroyFrameBuffer(frameBuffer *fb);
