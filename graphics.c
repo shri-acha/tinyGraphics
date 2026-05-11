@@ -91,20 +91,25 @@ int renderCircle(frameBuffer *fb, int x, int y, int r) {
   return 0;
 }
 
-int *rotate_point(int x, int y, float theta, int axis) {
-  int *rt_pair = malloc(sizeof(int) * 2);
+typedef struct {
+  int x;
+  int y;
+} Point2;
+
+Point2 rotate_point(int x, int y, float theta, int axis) {
+  Point2 rt_pair;
   switch (axis) {
   case 0:
-    rt_pair[0] = y * sin(theta) + x * cos(theta);
-    rt_pair[1] = - x * sin(theta) + y * cos(theta);
+    rt_pair.x = y * sin(theta) + x * cos(theta);
+    rt_pair.y = -x * sin(theta) + y * cos(theta);
     break;
   case 1:
-    rt_pair[0] = x;
-    rt_pair[1] = y * cos(theta);
+    rt_pair.x = x;
+    rt_pair.y = y * cos(theta);
     break;
   case 2:
-    rt_pair[0] = x * cos(theta);
-    rt_pair[1] = y;
+    rt_pair.x = x * cos(theta);
+    rt_pair.y = y;
     break;
   default:
   }
@@ -119,32 +124,23 @@ int renderAngledCircle(frameBuffer *fb, int x, int y, int r, float theta,
 
   while (x1 > y1) {
 
-    int *rt_points_0 = rotate_point(x1, y1, theta, axis);
-    int *rt_points_1 = rotate_point(-x1, y1, theta, axis);
-    int *rt_points_2 = rotate_point(x1, -y1, theta, axis);
-    int *rt_points_3 = rotate_point(-x1, -y1, theta, axis);
-    int *rt_points_4 = rotate_point(y1, x1, theta, axis);
-    int *rt_points_5 = rotate_point(y1, -x1, theta, axis);
-    int *rt_points_6 = rotate_point(-y1, x1, theta, axis);
-    int *rt_points_7 = rotate_point(-y1, -x1, theta, axis);
+    Point2 rt_points_0 = rotate_point(x1, y1, theta, axis);
+    Point2 rt_points_1 = rotate_point(-x1, y1, theta, axis);
+    Point2 rt_points_2 = rotate_point(x1, -y1, theta, axis);
+    Point2 rt_points_3 = rotate_point(-x1, -y1, theta, axis);
+    Point2 rt_points_4 = rotate_point(y1, x1, theta, axis);
+    Point2 rt_points_5 = rotate_point(y1, -x1, theta, axis);
+    Point2 rt_points_6 = rotate_point(-y1, x1, theta, axis);
+    Point2 rt_points_7 = rotate_point(-y1, -x1, theta, axis);
 
-    renderPoint(fb, x + rt_points_0[0], y + rt_points_0[1]);
-    renderPoint(fb, x + rt_points_1[0], y + rt_points_1[1]);
-    renderPoint(fb, x + rt_points_2[0], y + rt_points_2[1]);
-    renderPoint(fb, x + rt_points_3[0], y + rt_points_3[1]);
-    renderPoint(fb, y + rt_points_4[0], x + rt_points_4[1]);
-    renderPoint(fb, y + rt_points_5[0], x + rt_points_5[1]);
-    renderPoint(fb, y + rt_points_6[0], x + rt_points_6[1]);
-    renderPoint(fb, y + rt_points_7[0], x + rt_points_7[1]);
-
-    free(rt_points_7);
-    free(rt_points_6);
-    free(rt_points_5);
-    free(rt_points_4);
-    free(rt_points_3);
-    free(rt_points_2);
-    free(rt_points_1);
-    free(rt_points_0);
+    renderPoint(fb, x + rt_points_0.x, y + rt_points_0.y);
+    renderPoint(fb, x + rt_points_1.x, y + rt_points_1.y);
+    renderPoint(fb, x + rt_points_2.x, y + rt_points_2.y);
+    renderPoint(fb, x + rt_points_3.x, y + rt_points_3.y);
+    renderPoint(fb, y + rt_points_4.x, x + rt_points_4.y);
+    renderPoint(fb, y + rt_points_5.x, x + rt_points_5.y);
+    renderPoint(fb, y + rt_points_6.x, x + rt_points_6.y);
+    renderPoint(fb, y + rt_points_7.x, x + rt_points_7.y);
 
     y1++;
     t1 += y1;
@@ -157,13 +153,23 @@ int renderAngledCircle(frameBuffer *fb, int x, int y, int r, float theta,
   return 0;
 }
 
-int flushPixelBuffer(pixelBuffer *pb, int width, int height) {
-  memset((void *)pb, 0, height * width * sizeof(uint16_t));
-  return 0;
-}
-
 int destroyFrameBuffer(frameBuffer *fb) {
   free(fb->buffer);
   free(fb);
+  return 0;
+}
+/*Sets the value of the pixel for the pixelBuffer at (x,y) */
+void set_pixel(frameBuffer *fb, pixelBuffer pb, int x, int y) {
+  fb->buffer[get_index(fb, x, y)] = pb;
+}
+
+/*Gets the value of the pixel for the pixelBuffer at (x,y) */
+pixelBuffer get_pixe(frameBuffer *fb, int x, int y) {
+  return fb->buffer[get_index(fb, x, y)];
+}
+
+/*Flushes the pixel buffer of width * height*/
+int flushPixelBuffer(pixelBuffer *pb, int width, int height) {
+  memset((void *)pb, 0, height * width * sizeof(pixelBuffer));
   return 0;
 }
