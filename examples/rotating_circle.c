@@ -36,7 +36,7 @@ int main() {
   float theta = 0.0;
   // renderLine(fb, 2, 2, 11, 12);
   while (1) {
-    renderAngledCircle(fb, 25, 25, 10, theta);
+    renderAngledCircle(fb, 25, 25, 10, theta, 2);
     format_frame_buffer(fb);
     usleep(1e5);
     flushPixelBuffer(fb->buffer, fb->width, fb->height);

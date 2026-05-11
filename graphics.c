@@ -91,28 +91,42 @@ int renderCircle(frameBuffer *fb, int x, int y, int r) {
   return 0;
 }
 
-int *rotate_point(int x, int y, float theta) {
+int *rotate_point(int x, int y, float theta, int axis) {
   int *rt_pair = malloc(sizeof(int) * 2);
-  rt_pair[0] = x * cos(theta);
-  rt_pair[1] = y;
+  switch (axis) {
+  case 0:
+    rt_pair[0] = y * sin(theta) + x * cos(theta);
+    rt_pair[1] = - x * sin(theta) + y * cos(theta);
+    break;
+  case 1:
+    rt_pair[0] = x;
+    rt_pair[1] = y * cos(theta);
+    break;
+  case 2:
+    rt_pair[0] = x * cos(theta);
+    rt_pair[1] = y;
+    break;
+  default:
+  }
   return rt_pair;
 }
 
-int renderAngledCircle(frameBuffer *fb, int x, int y, int r, float theta) {
+int renderAngledCircle(frameBuffer *fb, int x, int y, int r, float theta,
+                       int axis) {
   int x1 = r;
   int y1 = 0;
   float t1 = r >> 4;
 
   while (x1 > y1) {
 
-    int *rt_points_0 = rotate_point(x1, y1, theta);
-    int *rt_points_1 = rotate_point(-x1, y1, theta);
-    int *rt_points_2 = rotate_point(x1, -y1, theta);
-    int *rt_points_3 = rotate_point(-x1, -y1, theta);
-    int *rt_points_4 = rotate_point(y1, x1, theta);
-    int *rt_points_5 = rotate_point(y1, -x1, theta);
-    int *rt_points_6 = rotate_point(-y1, x1, theta);
-    int *rt_points_7 = rotate_point(-y1, -x1, theta);
+    int *rt_points_0 = rotate_point(x1, y1, theta, axis);
+    int *rt_points_1 = rotate_point(-x1, y1, theta, axis);
+    int *rt_points_2 = rotate_point(x1, -y1, theta, axis);
+    int *rt_points_3 = rotate_point(-x1, -y1, theta, axis);
+    int *rt_points_4 = rotate_point(y1, x1, theta, axis);
+    int *rt_points_5 = rotate_point(y1, -x1, theta, axis);
+    int *rt_points_6 = rotate_point(-y1, x1, theta, axis);
+    int *rt_points_7 = rotate_point(-y1, -x1, theta, axis);
 
     renderPoint(fb, x + rt_points_0[0], y + rt_points_0[1]);
     renderPoint(fb, x + rt_points_1[0], y + rt_points_1[1]);

@@ -28,11 +28,9 @@ int renderLine(frameBuffer *fb, int x1, int y1, int x2, int y2);
 int renderCircle(frameBuffer *fb, int x, int y, int r);
 
 /*
- * Renders a circle of radius r with center at (x,y) rotated about the central axis through its center at theta degrees.
- * Uses Jesko's method to reduce the number of overall operations,
- * optimizing for low performance systems
+ * Renders a circle of radius r with center at (x,y) rotated about the axis (0(z),1(x),2(y)) through its center at theta degrees.
  */
-int renderAngledCircle(frameBuffer *fb, int x, int y, int r, float theta);
+int renderAngledCircle(frameBuffer *fb, int x, int y, int r, float theta,int axis);
 
 /*Returns an equivalent index of (x,y) in a linear buffer*/
 int get_index(frameBuffer *fb, int x, int y);
