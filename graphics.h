@@ -20,6 +20,11 @@ typedef enum {
 } renderMode;
 
 typedef struct {
+  int x;
+  int y;
+} Point2;
+
+typedef struct {
   frameBuffer *frame_buffer;
   renderMode render_mode;
 } renderContext;

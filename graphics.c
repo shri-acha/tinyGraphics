@@ -54,6 +54,33 @@ int renderLine(renderContext *rc, int x1, int y1, int x2, int y2) {
   return 0;
 }
 
+/* This directly renders the line without using the conventional bressenham
+ * approach, this method is usually superior to bressenham approach as it
+ * doesn't move in y direction implicitly
+ * */
+void renderHorizontalLine(renderContext *rc, int x1, int x2, int y) {
+  if (x1 > x2) {
+    int tmp = x1;
+    x1 = x2;
+    x2 = tmp;
+  }
+
+  if (y < 0 || y >= rc->frame_buffer->height)
+    return;
+
+  if (x1 < 0)
+    x1 = 0;
+  if (x2 >= rc->frame_buffer->width)
+    x2 = rc->frame_buffer->width - 1;
+
+  pixelBuffer *ptr =
+      &rc->frame_buffer->buffer[y * rc->frame_buffer->width + x1];
+  for (int i = x1; i <= x2; i++) {
+    ptr->color.literal = 0xFFFF; // Or your current color
+    ptr++;
+  }
+}
+
 int renderCircle(renderContext *rc, int x, int y, int r) {
   int x1 = r;
   int y1 = 0;
@@ -83,10 +110,10 @@ int renderCircle(renderContext *rc, int x, int y, int r) {
   case FILLED:
     while (x1 > y1) {
 
-      renderLine(rc, x + x1, y + y1, x - x1, y + y1);
-      renderLine(rc, x + x1, y - y1, x - x1, y - y1);
-      renderLine(rc, y + y1, x + x1, y - y1, x + x1);
-      renderLine(rc, y + y1, x - x1, y - y1, x - x1);
+      renderHorizontalLine(rc, x - x1, x + x1, y + y1);
+      renderHorizontalLine(rc, x - x1, x + x1, y - y1);
+      renderHorizontalLine(rc, x - y1, x + y1, y + x1);
+      renderHorizontalLine(rc, x - y1, x + y1, y - x1);
 
       y1++;
       t1 += y1;
@@ -100,11 +127,6 @@ int renderCircle(renderContext *rc, int x, int y, int r) {
   }
   return 0;
 }
-
-typedef struct {
-  int x;
-  int y;
-} Point2;
 
 Point2 rotate_point(int x, int y, float theta, int axis) {
   Point2 rt_pair;
@@ -178,14 +200,14 @@ int renderAngledCircle(renderContext *rc, int x, int y, int r, float theta,
       Point2 rt_points_6 = rotate_point(-y1, x1, theta, axis);
       Point2 rt_points_7 = rotate_point(-y1, -x1, theta, axis);
 
-      renderLine(rc, x + rt_points_0.x, y + rt_points_0.y, x + rt_points_1.x,
-                 y + rt_points_1.y);
-      renderLine(rc, x + rt_points_2.x, y + rt_points_2.y, x + rt_points_3.x,
-                 y + rt_points_3.y);
-      renderLine(rc, y + rt_points_4.x, x + rt_points_4.y, y + rt_points_7.x,
-                 x + rt_points_7.y);
-      renderLine(rc, y + rt_points_6.x, x + rt_points_6.y, y + rt_points_5.x,
-                 x + rt_points_5.y);
+      renderHorizontalLine(rc, x + rt_points_1.x, x + rt_points_1.x,
+                           y + rt_points_0.y);
+      renderHorizontalLine(rc, x + rt_points_1.x, x + rt_points_3.x,
+                            y + rt_points_2.y);
+      renderHorizontalLine(rc, y + rt_points_4.x, x + rt_points_4.y,
+                           y + rt_points_7.x, x + rt_points_7.y);
+      renderHorizontalLine(rc, y + rt_points_6.x, x + rt_points_6.y,
+                           y + rt_points_5.x, x + rt_points_5.y);
 
       y1++;
       t1 += y1;
@@ -197,6 +219,10 @@ int renderAngledCircle(renderContext *rc, int x, int y, int r, float theta,
     }
   }
 
+  return 0;
+}
+
+int renderTriagle(renderContext *rc, Point2 p1, Point2 p2, Point2 p3) {
   return 0;
 }
 
