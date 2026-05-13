@@ -13,8 +13,6 @@ int format_frame_buffer(frameBuffer *fb) {
     }
     printf("\n");
   }
-  printf("\x1B[2J");
-  printf("\x1B[H");
   return 0;
 }
 
@@ -31,8 +29,9 @@ int clear_frame_buffer(frameBuffer *fb) {
 
 int main() {
   frameBuffer* fb = createFrameBuffer(50, 50);
+  renderContext rc = {.frame_buffer = fb, .render_mode = FILLED };
   // renderLine(fb, 2, 2, 11, 12);
-  renderCircle(fb,25,25,10);
+  renderCircle(&rc,25,25,10);
   format_frame_buffer(fb);
   destroyFrameBuffer(fb);
   return 0;
