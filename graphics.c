@@ -87,7 +87,7 @@ int renderCircle(renderContext *rc, int x, int y, int r) {
   float t1 = r >> 4;
   switch (rc->render_mode) {
   case WIREFRAME:
-    while (x1 > y1) {
+    while (x1 >= y1) {
 
       renderPoint(rc, x + x1, y + y1);
       renderPoint(rc, x - x1, y + y1);
@@ -108,7 +108,7 @@ int renderCircle(renderContext *rc, int x, int y, int r) {
     }
     break;
   case FILLED:
-    while (x1 > y1) {
+    while (x1 >= y1) {
 
       renderHorizontalLine(rc, x - x1, x + x1, y + y1);
       renderHorizontalLine(rc, x - x1, x + x1, y - y1);
@@ -156,7 +156,7 @@ int renderAngledCircle(renderContext *rc, int x, int y, int r, float theta,
 
   switch (rc->render_mode) {
   case WIREFRAME:
-    while (x1 > y1) {
+    while (x1 >= y1) {
 
       Point2 rt_points_0 = rotate_point(x1, y1, theta, axis);
       Point2 rt_points_1 = rotate_point(-x1, y1, theta, axis);
@@ -186,7 +186,7 @@ int renderAngledCircle(renderContext *rc, int x, int y, int r, float theta,
     }
     break;
   case FILLED:
-    while (x1 > y1) {
+    while (x1 >= y1) {
 
       Point2 rt_points_0 = rotate_point(x1, y1, theta, axis);
       Point2 rt_points_1 = rotate_point(-x1, y1, theta, axis);
@@ -200,14 +200,14 @@ int renderAngledCircle(renderContext *rc, int x, int y, int r, float theta,
       Point2 rt_points_6 = rotate_point(-y1, x1, theta, axis);
       Point2 rt_points_7 = rotate_point(-y1, -x1, theta, axis);
 
-      renderHorizontalLine(rc, x + rt_points_1.x, x + rt_points_1.x,
+      renderHorizontalLine(rc, x + rt_points_1.x, x + rt_points_0.x,
                            y + rt_points_0.y);
-      renderHorizontalLine(rc, x + rt_points_1.x, x + rt_points_3.x,
-                            y + rt_points_2.y);
-      renderHorizontalLine(rc, y + rt_points_4.x, x + rt_points_4.y,
-                           y + rt_points_7.x, x + rt_points_7.y);
-      renderHorizontalLine(rc, y + rt_points_6.x, x + rt_points_6.y,
-                           y + rt_points_5.x, x + rt_points_5.y);
+      renderHorizontalLine(rc, x + rt_points_1.x, x + rt_points_0.x,
+                           y + rt_points_2.y);
+      renderHorizontalLine(rc, x + rt_points_6.x, x + rt_points_4.x,
+                           y + rt_points_4.y);
+      renderHorizontalLine(rc, x + rt_points_7.x, x + rt_points_5.x,
+                           y + rt_points_5.y);
 
       y1++;
       t1 += y1;
