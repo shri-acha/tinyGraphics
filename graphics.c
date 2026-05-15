@@ -223,6 +223,15 @@ int renderAngledCircle(renderContext *rc, int x, int y, int r, float theta,
 }
 
 int renderTriagle(renderContext *rc, Point2 p1, Point2 p2, Point2 p3) {
+  switch (rc->render_mode) {
+    case WIREFRAME:
+      renderLine(rc,p1.x,p1.y,p2.x,p2.y);
+      renderLine(rc,p2.x,p2.y,p3.x,p3.y);
+      renderLine(rc,p3.x,p3.y,p1.x,p1.y);
+      break;
+    case FILLED:
+      break;
+  }
   return 0;
 }
 
