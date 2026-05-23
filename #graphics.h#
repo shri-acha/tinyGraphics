@@ -1,7 +1,33 @@
-#pragma once
-#include "types.h"
-#include "utils.h"
-#include <stdlib.h>
+yes#include <stdint.h>
+
+typedef struct {
+  uint16_t literal;
+} Color; // 00000(R) 000000(G) 00000(B)
+
+typedef struct __attribute__((__packed__)) {
+  Color color;
+} pixelBuffer;
+
+typedef struct {
+  int width;
+  int height;
+  pixelBuffer *buffer;
+} frameBuffer;
+
+typedef enum {
+  WIREFRAME,
+  FILLED,
+} renderMode;
+
+typedef struct {
+  int x;
+  int y;
+} Point2;
+
+typedef struct {
+  frameBuffer *frame_buffer;
+  renderMode render_mode;
+} renderContext;
 
 /*Renders a point at (x,y)*/
 int renderPoint(renderContext *rc, int x, int y);
@@ -23,7 +49,7 @@ int renderCircle(renderContext *rc, int x, int y, int r);
 int renderAngledCircle(renderContext *rc, int x, int y, int r, float theta,
                        int axis);
 /*Renders a triangle*/
-int renderTriagle(renderContext *rc, Point2* points,size_t points_len);
+int renderTriagle(renderContext *rc, Point2 p1, Point2 p2, Point2 p3);
 
 /*Returns an equivalent index of (x,y) in a linear buffer*/
 int get_index(frameBuffer *fb, int x, int y);

@@ -1,5 +1,4 @@
 #include "../graphics.h"
-#include <math.h>
 #include <stdio.h>
 #include <unistd.h>
 
@@ -33,14 +32,15 @@ int clear_frame_buffer(frameBuffer *fb) {
 
 int main() {
   frameBuffer *fb = createFrameBuffer(50, 50);
-  renderContext rc = {.frame_buffer = fb, .render_mode = WIREFRAME };
+  renderContext rc = {.frame_buffer = fb, .render_mode = FILLED};
   float theta = 0.0;
-  Point2 p1 = {.x=25,.y=0};
-  Point2 p2 = {.x=12,.y=25};
-  Point2 p3 = {.x=50,.y=25};
+  Point2 p1 = {.x = 25, .y = 0};
+  Point2 p2 = {.x = 12, .y = 25};
+  Point2 p3 = {.x = 50, .y = 25};
+  Point2 points[3] = {p1, p2, p3};
   // renderLine(fb, 2, 2, 11, 12);
   while (1) {
-    renderTriagle(&rc,p1,p2,p3);
+    renderTriagle(&rc, (Point2 *)&points, 3);
     format_frame_buffer(fb);
     usleep(1e5);
     flushPixelBuffer(fb->buffer, fb->width, fb->height);

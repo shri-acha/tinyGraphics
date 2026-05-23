@@ -1,14 +1,9 @@
 #include "graphics.h"
 #include <math.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-int get_index(frameBuffer *fb, int x, int y) {
-  if (x < 0 || x >= fb->width || y < 0 || y >= fb->height)
-    return -1;
-  return y * fb->width + x;
-}
 
 frameBuffer *createFrameBuffer(int width, int height) {
   pixelBuffer *buffer = calloc(width * height, sizeof(pixelBuffer));
@@ -222,35 +217,42 @@ int renderAngledCircle(renderContext *rc, int x, int y, int r, float theta,
   return 0;
 }
 
-int renderTriagle(renderContext *rc, Point2 p1, Point2 p2, Point2 p3) {
+int renderTriagle(renderContext *rc, Point2 *points, size_t points_len) {
+
+  Point2 p1 = points[1];
+  Point2 p2 = points[2];
+  Point2 p3 = points[3];
+
   switch (rc->render_mode) {
-    case WIREFRAME:
-      renderLine(rc,p1.x,p1.y,p2.x,p2.y);
-      renderLine(rc,p2.x,p2.y,p3.x,p3.y);
-      renderLine(rc,p3.x,p3.y,p1.x,p1.y);
-      break;
-    case FILLED:
-      break;
+  case WIREFRAME:
+    renderLine(rc, p1.x, p1.y, p2.x, p2.y);
+    renderLine(rc, p2.x, p2.y, p3.x, p3.y);
+    renderLine(rc, p3.x, p3.y, p1.x, p1.y);
+    break;
+  case FILLED:
+    Point2 temp;
+    for (int i = 0; i < points_len - 2; ++i) {
+      for (int j = 1; j < points_len - 1; ++j) {
+        if (compare_point2(GT, points[j], points[i])) {
+          temp = points[i];
+          points[i] = points[i + 1];
+          points[i + 1] = temp;
+        }
+      }
+    }
+    break;
   }
   return 0;
 }
 
+/* Frees the fat pointer of the framebuffer */
 int destroyFrameBuffer(frameBuffer *fb) {
   free(fb->buffer);
   free(fb);
   return 0;
 }
-/*Sets the value of the pixel for the pixelBuffer at (x,y) */
-void set_pixel(frameBuffer *fb, pixelBuffer pb, int x, int y) {
-  fb->buffer[get_index(fb, x, y)] = pb;
-}
 
-/*Gets the value of the pixel for the pixelBuffer at (x,y) */
-pixelBuffer get_pixel(frameBuffer *fb, int x, int y) {
-  return fb->buffer[get_index(fb, x, y)];
-}
-
-/*Flushes the pixel buffer of width * height*/
+/*Flushes the pixel buffer of width * height */
 int flushPixelBuffer(pixelBuffer *pb, int width, int height) {
   memset((void *)pb, 0, height * width * sizeof(pixelBuffer));
   return 0;

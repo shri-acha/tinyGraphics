@@ -1,0 +1,24 @@
+#include "utils.h"
+
+int compare_point2(Operator op, Point2 p1, Point2 p2) {
+  switch (op) {
+  case EQ:
+    if (p1.x == p2.x && p1.y == p2.y) {
+      return 0;
+    }
+    break;
+  case GT:
+    if (p1.x > p2.x && p1.y > p2.y) {
+      return 0;
+    }
+    break;
+  case LT:
+    if (p1.x < p2.x && p1.y < p2.y) {
+      return 0;
+    }
+    break;
+  default:
+    return 1;
+  }
+  return 1;
+}
