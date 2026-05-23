@@ -1,7 +1,0 @@
-#include "types.h"
-
-typedef enum {
-  EQ,
-  GT,
-  LT,
-} Operator;
