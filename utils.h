@@ -1,5 +1,7 @@
 #pragma once
 #include "types.h"
+#include <stdlib.h>
+
 typedef enum {
   EQ,
   GT,
@@ -14,3 +16,5 @@ pixelBuffer get_pixel(frameBuffer *fb, int x, int y);
 int compare_point2(Operator op, Point2 p1, Point2 p2);
 
 int get_index(frameBuffer *fb, int x, int y);
+
+int sort_point2(Point2** points,size_t points_len);

@@ -23,7 +23,7 @@ int renderCircle(renderContext *rc, int x, int y, int r);
 int renderAngledCircle(renderContext *rc, int x, int y, int r, float theta,
                        int axis);
 /*Renders a triangle*/
-int renderTriagle(renderContext *rc, Point2* points,size_t points_len);
+int renderTriangle(renderContext *rc, Point2* points[3]);
 
 /*Returns an equivalent index of (x,y) in a linear buffer*/
 int get_index(frameBuffer *fb, int x, int y);

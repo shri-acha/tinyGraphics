@@ -1,7 +1,7 @@
 #include "graphics.h"
 #include <math.h>
-#include <stdint.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -51,8 +51,7 @@ int renderLine(renderContext *rc, int x1, int y1, int x2, int y2) {
 
 /* This directly renders the line without using the conventional bressenham
  * approach, this method is usually superior to bressenham approach as it
- * doesn't move in y direction implicitly
- * */
+ * doesn't move in y direction implicitly */
 void renderHorizontalLine(renderContext *rc, int x1, int x2, int y) {
   if (x1 > x2) {
     int tmp = x1;
@@ -71,7 +70,7 @@ void renderHorizontalLine(renderContext *rc, int x1, int x2, int y) {
   pixelBuffer *ptr =
       &rc->frame_buffer->buffer[y * rc->frame_buffer->width + x1];
   for (int i = x1; i <= x2; i++) {
-    ptr->color.literal = 0xFFFF; // Or your current color
+    ptr->color.literal = 0xFFFF;
     ptr++;
   }
 }
@@ -217,31 +216,22 @@ int renderAngledCircle(renderContext *rc, int x, int y, int r, float theta,
   return 0;
 }
 
-int renderTriagle(renderContext *rc, Point2 *points, size_t points_len) {
+int renderTriangle(renderContext *rc, Point2 *points[3]) {
 
-  Point2 p1 = points[1];
-  Point2 p2 = points[2];
-  Point2 p3 = points[3];
+ Point2 p1 = *(points[0]);
+ Point2 p2 = *(points[1]);
+ Point2 p3 = *(points[2]);
 
-  switch (rc->render_mode) {
-  case WIREFRAME:
-    renderLine(rc, p1.x, p1.y, p2.x, p2.y);
-    renderLine(rc, p2.x, p2.y, p3.x, p3.y);
-    renderLine(rc, p3.x, p3.y, p1.x, p1.y);
-    break;
-  case FILLED:
-    Point2 temp;
-    for (int i = 0; i < points_len - 2; ++i) {
-      for (int j = 1; j < points_len - 1; ++j) {
-        if (compare_point2(GT, points[j], points[i])) {
-          temp = points[i];
-          points[i] = points[i + 1];
-          points[i + 1] = temp;
-        }
-      }
-    }
-    break;
-  }
+ switch (rc->render_mode) {
+ case WIREFRAME:
+   renderLine(rc, p1.x, p1.y, p2.x, p2.y);
+   renderLine(rc, p2.x, p2.y, p3.x, p3.y);
+   renderLine(rc, p3.x, p3.y, p1.x, p1.y);
+   break;
+ case FILLED:
+   sort_point2(points,3); 
+   break;
+ }
   return 0;
 }
 
