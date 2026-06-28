@@ -2,8 +2,8 @@
 #include <unistd.h>
 
 int main() {
-	frameBuffer* fb = createFrameBuffer(25, 25);
-	renderContext rc = {.frame_buffer = fb, .render_mode = WIREFRAME };
+	frameBuffer* fb = createFrameBuffer(25, 25,(uint16_t) 0b0000011111100000);
+	renderContext rc = {.frame_buffer = fb, .render_mode = WIREFRAME, .origin = (Index) {.x=12,.y=12} };
 	while (1) {
 
 		for (int j=0;j<=25;j++){

@@ -1,7 +1,6 @@
 #include "graphics.h"
 
-int renderLine(renderContext *rc, Point2 p1, Point2 p2) {
-
+void renderLine(renderContext *rc, Point2 p1, Point2 p2) {
   int x1 = p1.x,y1 = p1.y;
   int x2 = p2.x,y2 = p2.y;
 
@@ -25,7 +24,11 @@ int renderLine(renderContext *rc, Point2 p1, Point2 p2) {
       y1 += sy;
     }
   }
-  return 0;
+
+  //if (rc->scene_context == NULL){
+	//  loadRenderedObjectToContext(rc->scene_context->obj,renderedObject{.type=LINE,.inner=(Line) {.start = p1,.end = p2}})
+  //}
+  return;
 }
 
 void renderHorizontalLine(renderContext *rc, int x1, int x2, int y) {
@@ -35,18 +38,7 @@ void renderHorizontalLine(renderContext *rc, int x1, int x2, int y) {
     x2 = tmp;
   }
 
-  if (y < 0 || y >= rc->frame_buffer->height)
-    return;
-
-  if (x1 < 0)
-    x1 = 0;
-  if (x2 >= rc->frame_buffer->width)
-    x2 = rc->frame_buffer->width - 1;
-
-  pixelBuffer *ptr =
-      &rc->frame_buffer->buffer[y * rc->frame_buffer->width + x1];
   for (int i = x1; i <= x2; i++) {
-    ptr->color.literal = 0xFFFF;
-    ptr++;
+    renderPoint(rc,(Point2){.x=i,.y=y});
   }
 }

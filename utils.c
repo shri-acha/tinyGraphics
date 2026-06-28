@@ -56,23 +56,3 @@ int sort_point2(Point2 **points, size_t points_len) {
   return 0;
 }
 
-Point2 rotate_point(int x, int y, float theta, axis ax) {
-  Point2 rt_pair;
-  switch (ax) {
-  case Z:
-    rt_pair.x = y * sin(theta) + x * cos(theta);
-    rt_pair.y = -x * sin(theta) + y * cos(theta);
-    break;
-  case X:
-    rt_pair.x = x;
-    rt_pair.y = y * cos(theta);
-    break;
-  case Y:
-    rt_pair.x = x * cos(theta);
-    rt_pair.y = y;
-    break;
-  default:
-	 break;
-  }
-  return rt_pair;
-}

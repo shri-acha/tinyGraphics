@@ -12,7 +12,7 @@
 int renderPoint(renderContext *rc, Point2 p);
 
 /*Renders line from (x1,y1) to (x2,y2)*/
-int renderLine(renderContext *rc, Point2 p1, Point2 p2);
+void renderLine(renderContext *rc, Point2 p1, Point2 p2);
 
 /* This directly renders the line without using the conventional bressenham
  * approach, this method is usually superior to bressenham approach as it
@@ -47,17 +47,20 @@ void set_pixel(frameBuffer *fb, pixelBuffer pb, int x, int y);
 /*Returns the color at the index of (x,y) from the frame buffer*/
 pixelBuffer get_pixel(frameBuffer *fb, int x, int y);
 
-/*Renders a point at (x,y)*/
-Point2 rotate_point(int x, int y,float theta, axis ax);
-
 /*Flushes the pixel buffer of width * height */
 int flushPixelBuffer(pixelBuffer *pb, int width, int height);
 
-/*Returns an instance of frameBuffer with width*height*/
-frameBuffer *createFrameBuffer(int width, int height);
+/*Returns an instance of frameBuffer with width*height with 5R6G5B color*/
+frameBuffer *createFrameBuffer(int width, int height,uint16_t color);
 
 /* Frees the fat pointer of the framebuffer */
 int destroyFrameBuffer(frameBuffer *fb);
 
 /* Outputs the pixelBuffer into the stdout*/
 void formatBuffer(frameBuffer *fb);
+
+/*Sets the origin within the context of render*/
+void set_origin(renderContext* rc, Point2 origin);
+
+/*Rotates a the given point about a given axis given the renderContext containing the origin*/
+Point2 rotatePoint(renderContext* rc,int x, int y, float theta, axis ax); 
