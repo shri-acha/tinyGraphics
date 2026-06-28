@@ -36,8 +36,8 @@ int main() {
 
 		for (int j=0;j<=25;j++){
 			for (int i=0;i<=20;i++){
-				renderLine(&rc, i, j, i+5,j);
-				renderLine(&rc, j, i, j,i+5);
+				renderLine(&rc, (Point2){.x=i, .y=j}, (Point2){.x=i+5,.y=j});
+				renderLine(&rc, (Point2){.x=j, .y=i}, (Point2){.x=j,.y=i+5});
 				format_frame_buffer(fb);
 				usleep(1e5);
 				flushPixelBuffer(fb->buffer,fb->width,fb->height);

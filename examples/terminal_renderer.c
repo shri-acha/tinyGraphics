@@ -30,8 +30,8 @@ int clear_frame_buffer(frameBuffer *fb) {
 int main() {
   frameBuffer* fb = createFrameBuffer(50, 50);
   renderContext rc = {.frame_buffer = fb, .render_mode = FILLED };
-  // renderLine(fb, 2, 2, 11, 12);
-  renderCircle(&rc,25,25,10);
+
+  renderCircle(&rc,(Point2){.x = 25,.y=25},10);
   format_frame_buffer(fb);
   destroyFrameBuffer(fb);
   return 0;

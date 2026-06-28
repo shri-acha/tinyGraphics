@@ -12,21 +12,21 @@ pixelBuffer get_pixel(frameBuffer *fb, int x, int y) {
   return fb->buffer[get_index(fb, x, y)];
 }
 
-/* General comparison operations for Point2 types */
-int compare_point2(Operator op, Point2 p1, Point2 p2) {
+/* General comparison operations*/
+int compare_value(Operator op, int p1, int p2) {
   switch (op) {
   case EQ:
-    if (p1.x == p2.x && p1.y == p2.y) {
+    if (p1 == p2) {
       return 0;
     }
     break;
   case GT:
-    if (p1.x > p2.x && p1.y > p2.y) {
+    if (p1 > p2) {
       return 0;
     }
     break;
   case LT:
-    if (p1.x < p2.x && p1.y < p2.y) {
+    if (p1 < p2) {
       return 0;
     }
     break;
@@ -46,7 +46,7 @@ int sort_point2(Point2 **points, size_t points_len) {
   Point2 temp;
   for (int i = 0; i < points_len - 2; ++i) {
     for (int j = 1; j < points_len - 1; ++j) {
-      if (compare_point2(GT, *points[j], *points[i])) {
+      if (compare_value(GT, (*points[j]).y, (*points[i]).y)) {
         temp = *points[i];
         points[i] = points[i + 1];
         *points[i + 1] = temp;
@@ -54,4 +54,25 @@ int sort_point2(Point2 **points, size_t points_len) {
     }
   }
   return 0;
+}
+
+Point2 rotate_point(int x, int y, float theta, int axis) {
+  Point2 rt_pair;
+  switch (axis) {
+  case 0:
+    rt_pair.x = y * sin(theta) + x * cos(theta);
+    rt_pair.y = -x * sin(theta) + y * cos(theta);
+    break;
+  case 1:
+    rt_pair.x = x;
+    rt_pair.y = y * cos(theta);
+    break;
+  case 2:
+    rt_pair.x = x * cos(theta);
+    rt_pair.y = y;
+    break;
+  default:
+	 break;
+  }
+  return rt_pair;
 }
