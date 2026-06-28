@@ -67,14 +67,14 @@ int renderTriangle(renderContext *rc, Point2 *points[3]) {
     }
     return 0;
 }
-int renderAngledTriangle(renderContext *rc,Point2 *points[3], float theta, int axis){
+int renderAngledTriangle(renderContext *rc,Point2 *points[3], float theta, axis ax){
 		Point2 p1 = (*points[0]);
 		Point2 p2 = (*points[1]);
 		Point2 p3 = (*points[2]);
 
-      Point2 rt_points_0 = rotate_point(p1.x, p1.y, theta, axis);
-      Point2 rt_points_1 = rotate_point(p2.x, p2.y, theta, axis);
-      Point2 rt_points_2 = rotate_point(p3.x, p3.y, theta, axis);
+      Point2 rt_points_0 = rotate_point(p1.x, p1.y, theta, ax);
+      Point2 rt_points_1 = rotate_point(p2.x, p2.y, theta, ax);
+      Point2 rt_points_2 = rotate_point(p3.x, p3.y, theta, ax);
 
 		Point2* rt_points[3] = {&rt_points_0,&rt_points_1,&rt_points_2};
 

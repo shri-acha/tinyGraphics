@@ -1,33 +1,5 @@
 #include "../graphics.h"
-#include <stdio.h>
 #include <unistd.h>
-
-int format_frame_buffer(frameBuffer *fb) {
-  printf("\x1B[2J");
-  printf("\x1B[H");
-  
-  for (int y = 0; y < fb->height; y++) {
-    for (int x = 0; x < fb->width; x++) {
-      int index = (y * fb->width) + x;
-      if (fb->buffer[index].color.literal) {
-        printf("\e[32m%d\e[0m\t", fb->buffer[index].color.literal);
-      } else {
-        printf(".\t");
-      }
-    }
-    printf("\n");
-  }
-  return 0;
-}
-
-int clear_frame_buffer(frameBuffer *fb) {
-  for (int y = 0; y < fb->height; y++) {
-    for (int x = 0; x < fb->width; x++) {
-      fb->buffer[(y * fb->width) + x].color.literal = 0;
-    }
-  }
-  return 0;
-}
 
 int main() {
   frameBuffer *fb = createFrameBuffer(50, 50);
@@ -42,7 +14,7 @@ int main() {
   while (1) {
 	 flushPixelBuffer(fb->buffer, fb->width, fb->height);
     renderTriangle(&rc, points);
-    format_frame_buffer(fb);
+    formatBuffer(fb);
     usleep(100000);
   }
   

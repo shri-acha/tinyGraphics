@@ -9,15 +9,29 @@ frameBuffer *createFrameBuffer(int width, int height) {
   return fb;
 }
 
-/* Frees the fat pointer of the framebuffer */
 int destroyFrameBuffer(frameBuffer *fb) {
   free(fb->buffer);
   free(fb);
   return 0;
 }
 
-/*Flushes the pixel buffer of width * height */
 int flushPixelBuffer(pixelBuffer *pb, int width, int height) {
   memset((void *)pb, 0, height * width * sizeof(pixelBuffer));
   return 0;
+}
+
+void formatBuffer(frameBuffer *fb) {
+  for (int j = 0; j < fb->width; j++) {
+    for (int i = 0; i < fb->height; i++) {
+      if (fb->buffer[j * fb->width + i].color.literal) {
+        printf("\e[32m%d\e[0m\t",
+               fb->buffer[(j * (fb->width)) + i].color.literal);
+      } else {
+        printf("%d\t", fb->buffer[(j * (fb->width)) + i].color.literal);
+      }
+    }
+    printf("\n");
+  }
+  printf("\x1B[2J");
+  printf("\x1B[H");
 }

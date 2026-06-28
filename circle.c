@@ -50,7 +50,7 @@ int renderCircle(renderContext *rc, Point2 p, int r) {
 }
 
 int renderAngledCircle(renderContext *rc, Point2 p, int r, float theta,
-                       int axis) {
+                       axis ax) {
   int x1 = r;
   int y1 = 0;
   float t1 = r >> 4;
@@ -61,14 +61,14 @@ int renderAngledCircle(renderContext *rc, Point2 p, int r, float theta,
   case WIREFRAME:
     while (x1 >= y1) {
 
-      Point2 rt_points_0 = rotate_point(x1, y1, theta, axis);
-      Point2 rt_points_1 = rotate_point(-x1, y1, theta, axis);
-      Point2 rt_points_2 = rotate_point(x1, -y1, theta, axis);
-      Point2 rt_points_3 = rotate_point(-x1, -y1, theta, axis);
-      Point2 rt_points_4 = rotate_point(y1, x1, theta, axis);
-      Point2 rt_points_5 = rotate_point(y1, -x1, theta, axis);
-      Point2 rt_points_6 = rotate_point(-y1, x1, theta, axis);
-      Point2 rt_points_7 = rotate_point(-y1, -x1, theta, axis);
+      Point2 rt_points_0 = rotate_point(x1, y1, theta, ax);
+      Point2 rt_points_1 = rotate_point(-x1, y1, theta, ax);
+      Point2 rt_points_2 = rotate_point(x1, -y1, theta, ax);
+      Point2 rt_points_3 = rotate_point(-x1, -y1, theta, ax);
+      Point2 rt_points_4 = rotate_point(y1, x1, theta, ax);
+      Point2 rt_points_5 = rotate_point(y1, -x1, theta, ax);
+      Point2 rt_points_6 = rotate_point(-y1, x1, theta, ax);
+      Point2 rt_points_7 = rotate_point(-y1, -x1, theta, ax);
 
       renderPoint(rc,(Point2){.x= x + rt_points_0.x, y + rt_points_0.y});
       renderPoint(rc,(Point2){.x=x + rt_points_1.x,.y= y + rt_points_1.y});
@@ -91,17 +91,17 @@ int renderAngledCircle(renderContext *rc, Point2 p, int r, float theta,
   case FILLED:
     while (x1 >= y1) {
 
-      Point2 rt_points_0 = rotate_point(x1, y1, theta, axis);
-      Point2 rt_points_1 = rotate_point(-x1, y1, theta, axis);
+      Point2 rt_points_0 = rotate_point(x1, y1, theta, ax);
+      Point2 rt_points_1 = rotate_point(-x1, y1, theta, ax);
 
-      Point2 rt_points_2 = rotate_point(x1, -y1, theta, axis);
-      Point2 rt_points_3 = rotate_point(-x1, -y1, theta, axis);
+      Point2 rt_points_2 = rotate_point(x1, -y1, theta, ax);
+      Point2 rt_points_3 = rotate_point(-x1, -y1, theta, ax);
 
-      Point2 rt_points_4 = rotate_point(y1, x1, theta, axis);
-      Point2 rt_points_5 = rotate_point(y1, -x1, theta, axis);
+      Point2 rt_points_4 = rotate_point(y1, x1, theta, ax);
+      Point2 rt_points_5 = rotate_point(y1, -x1, theta, ax);
 
-      Point2 rt_points_6 = rotate_point(-y1, x1, theta, axis);
-      Point2 rt_points_7 = rotate_point(-y1, -x1, theta, axis);
+      Point2 rt_points_6 = rotate_point(-y1, x1, theta, ax);
+      Point2 rt_points_7 = rotate_point(-y1, -x1, theta, ax);
 
       renderHorizontalLine(rc, x + rt_points_1.x, x + rt_points_0.x,
                            y + rt_points_0.y);

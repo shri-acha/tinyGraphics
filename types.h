@@ -6,6 +6,12 @@ typedef struct {
   int y;
 } Point2;
 
+typedef enum {
+	X,
+	Y,
+	Z,
+}axis;
+
 typedef struct {
   uint16_t literal;
 } Color; // 00000(R) 000000(G) 00000(B)

@@ -21,4 +21,4 @@ int get_index(frameBuffer *fb, int x, int y);
 
 int sort_point2(Point2** points,size_t points_len);
 
-Point2 rotate_point(int x, int y, float theta, int axis); 
+Point2 rotate_point(int x, int y, float theta, axis ax); 
