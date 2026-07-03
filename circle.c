@@ -1,6 +1,9 @@
+#include "_graphics.h"
 #include "graphics.h"
+#include "types.h"
+#include <stdio.h>
 
-int renderCircle(renderContext *rc, Point2 p, int r) {
+void renderCircle(renderContext *rc, Point2 p, int r) {
   int x1 = r;
   int y1 = 0;
   int x = p.x;
@@ -46,10 +49,11 @@ int renderCircle(renderContext *rc, Point2 p, int r) {
     }
     break;
   }
-  return 0;
+  loadRenderedObjectToContext(rc, newCircleObject(r, 0, p, X));
+  return;
 }
 
-int renderAngledCircle(renderContext *rc, Point2 p, int r, float theta, axis ax) {
+void renderAngledCircle(renderContext *rc, Point2 p, int r, float theta, axis ax) {
   int x1 = r;
   int y1 = 0;
   float t1 = r >> 4;
@@ -105,6 +109,5 @@ int renderAngledCircle(renderContext *rc, Point2 p, int r, float theta, axis ax)
       }
     }
   }
-
-  return 0;
+  loadRenderedObjectToContext(rc, newCircleObject(r, theta, p, ax));
 }

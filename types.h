@@ -14,7 +14,7 @@ typedef struct {
 } Index;
 
 typedef enum {
-	X,
+	X, //DEFAULT AXIS OF ROTATION
 	Y,
 	Z,
 }axis;
@@ -51,14 +51,16 @@ typedef struct {
 }Line;
 
 typedef struct {
-	int radius;
-	axis ax;
-	int delta;
 	Point2 center;
+	int radius;
+	int theta;
+	axis ax;
 }Circle;
 
 typedef struct {
 	Point2* points[3];
+	int theta;
+	axis ax;
 }Triangle;
 
 typedef struct {
@@ -71,9 +73,8 @@ typedef struct {
 }renderedObject;
 
 typedef struct sceneContext{
-	renderedObject* obj;
-	struct sceneContext* next;
-	struct sceneContext* prev;
+	renderedObject* objs; // array of all objects being rendered
+	int no_of_objs; // number of objects registered and currently in scene
 }sceneContext;
 
 /// Render context holds relevant data and contexts required internally or by the user, like sceneContext, that can be passed to 
@@ -82,5 +83,5 @@ typedef struct {
   frameBuffer *frame_buffer;
   renderMode render_mode;
   Index origin;
-  sceneContext** scene_context;
+  sceneContext* scene_context;
 } renderContext;

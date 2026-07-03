@@ -1,26 +1,19 @@
-#include "graphics.h"
 #include "_graphics.h"
+#include "graphics.h"
 #include "types.h"
-#include <stdio.h>
+#define MAX_OBJECTS_IN_A_SCENE 128
 
-int loadRenderedObjectToContext(renderContext rc, renderedObject* ro){
-	if ((*rc.scene_context)->obj != NULL) {
-		if ((*rc.scene_context)->next != NULL ) {
-			fprintf(stderr,"[ERROR] failed load object");
-		} else {
-
-		}
+int loadRenderedObjectToContext(renderContext* rc, renderedObject* ro){
+	if ( 	 rc == NULL ||
+			 rc->scene_context == NULL ) {
+		return -1;
 	}
-}
-sceneContext newSceneContext(sceneContext* sc,renderedObject* ro) {
-
-	if (sc->obj == NULL) {
-		return (sceneContext) {
-			.obj = ro,
-			.next = NULL,
-			.prev = NULL,
-		};
+	if (rc->scene_context->objs != NULL) {
+		rc->scene_context->objs[rc->scene_context->no_of_objs++] = *ro;
+	}else {
+		rc->scene_context = newSceneContext();
+		rc->scene_context->no_of_objs = 0;
+		rc->scene_context->objs = malloc(sizeof(renderedObject) * MAX_OBJECTS_IN_A_SCENE);
 	}
-	else if (sc->obj != NULL && sc->next == NULL) {}
-
+	return 0;
 }

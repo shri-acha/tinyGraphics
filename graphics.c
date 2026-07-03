@@ -1,4 +1,5 @@
 #include "graphics.h"
+#include "types.h"
 #include <sys/types.h>
 
 frameBuffer *createFrameBuffer(int width, int height, uint16_t color_lit) {
@@ -10,15 +11,44 @@ frameBuffer *createFrameBuffer(int width, int height, uint16_t color_lit) {
   return fb;
 }
 
+sceneContext* newSceneContext() {
+	sceneContext* sc = malloc(sizeof(sceneContext));
+	sc->no_of_objs = 0;
+	sc->objs = NULL;
+	return sc;
+}
+
 int destroyFrameBuffer(frameBuffer *fb) {
+
+	if (fb == NULL) {
+		return -1;
+	}
+
   free(fb->buffer);
   free(fb);
+  return 0;
+}
+
+int destroyContext(renderContext* rc) {
+	sceneContext* sc = rc->scene_context;
+	if (sc == NULL) {
+		return -1;
+	}
+	for (int i=0;i<sc->no_of_objs;i++) {
+		free(sc->objs);
+	}
+	free(sc);
+	free(rc);
   return 0;
 }
 
 int flushPixelBuffer(pixelBuffer *pb, int width, int height) {
   memset((void *)pb, 0, height * width * sizeof(pixelBuffer));
   return 0;
+}
+
+int flushSceneContext(sceneContext *sc){
+	sc->no_of_objs = 0;
 }
 
 void formatBuffer(frameBuffer *fb) {

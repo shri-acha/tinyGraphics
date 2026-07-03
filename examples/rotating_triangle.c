@@ -3,7 +3,7 @@
 
 int main() {
 	frameBuffer* fb = createFrameBuffer(50,50,(uint16_t) 0b0000011111100000);
-  renderContext rc = {.frame_buffer = fb, .render_mode = WIREFRAME,.origin = (Index) {.x=25,.y=25} };
+  renderContext rc = {.frame_buffer = fb, .render_mode = WIREFRAME,.origin = (Index) {.x=25,.y=25}, .scene_context=newSceneContext() };
   float theta = 0.0;
 
   Point2 p1 = {.x = 25, .y = 0};
@@ -16,8 +16,10 @@ int main() {
     formatBuffer(fb);
     usleep(1e5);
     flushPixelBuffer(fb->buffer, fb->width, fb->height);
+	 flushSceneContext(rc.scene_context);
     theta += M_PI / 12;
   }
-  destroyFrameBuffer(fb);
+	destroyFrameBuffer(fb);
+	destroyContext(NULL);
   return 0;
 }

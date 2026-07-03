@@ -24,19 +24,19 @@ void renderHorizontalLine(renderContext *rc, int x1, int x2, int y);
  * Uses Jesko's method to reduce the number of overall operations,
  * optimizing for low performance systems
  */
-int renderCircle(renderContext *rc, Point2 p, int r);
+void renderCircle(renderContext *rc, Point2 p, int r);
 
 /*
  * Renders a circle of radius r with center at (x,y) rotated about the axis
  * through its center at theta degrees.
  */
-int renderAngledCircle(renderContext *rc, Point2 p, int r, float theta,
+void renderAngledCircle(renderContext *rc, Point2 p, int r, float theta,
                        axis ax);
 /*Renders a triangle*/
-int renderTriangle(renderContext *rc, Point2* points[3]);
+void renderTriangle(renderContext *rc, Point2* points[3]);
 
 /*Renders a triangle at an angle of theta with axis*/
-int renderAngledTriangle(renderContext *rc,Point2 *points[3], float theta, axis ax);
+void renderAngledTriangle(renderContext *rc,Point2 *points[3], float theta, axis ax);
 
 /*Returns an equivalent index of (x,y) in a linear buffer*/
 int get_index(frameBuffer *fb, int x, int y);
@@ -50,11 +50,17 @@ pixelBuffer get_pixel(frameBuffer *fb, int x, int y);
 /*Flushes the pixel buffer of width * height */
 int flushPixelBuffer(pixelBuffer *pb, int width, int height);
 
+/*Flushes the sceneContext*/
+int flushSceneContext(sceneContext* sc);
+
 /*Returns an instance of frameBuffer with width*height with 5R6G5B color*/
 frameBuffer *createFrameBuffer(int width, int height,uint16_t color);
 
 /* Frees the fat pointer of the framebuffer */
 int destroyFrameBuffer(frameBuffer *fb);
+
+/* Frees all the context associated memory */
+int destroyContext(renderContext* rc);
 
 /* Outputs the pixelBuffer into the stdout*/
 void formatBuffer(frameBuffer *fb);
@@ -64,3 +70,6 @@ void set_origin(renderContext* rc, Point2 origin);
 
 /*Rotates a the given point about a given axis given the renderContext containing the origin*/
 Point2 rotatePoint(renderContext* rc,int x, int y, float theta, axis ax); 
+
+/* Allocates and initializes a new sceneContext with a list of renderedObjects */
+sceneContext* newSceneContext();

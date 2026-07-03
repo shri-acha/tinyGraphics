@@ -1,4 +1,6 @@
 #include "graphics.h"
+#include "_graphics.h"
+#include "types.h"
 
 void renderLine(renderContext *rc, Point2 p1, Point2 p2) {
   int x1 = p1.x,y1 = p1.y;
@@ -25,9 +27,7 @@ void renderLine(renderContext *rc, Point2 p1, Point2 p2) {
     }
   }
 
-  //if (rc->scene_context == NULL){
-	//  loadRenderedObjectToContext(rc->scene_context->obj,renderedObject{.type=LINE,.inner=(Line) {.start = p1,.end = p2}})
-  //}
+  loadRenderedObjectToContext(rc, newLineObject(p1, p2)); 
   return;
 }
 
@@ -41,4 +41,5 @@ void renderHorizontalLine(renderContext *rc, int x1, int x2, int y) {
   for (int i = x1; i <= x2; i++) {
     renderPoint(rc,(Point2){.x=i,.y=y});
   }
+// TODO object context
 }

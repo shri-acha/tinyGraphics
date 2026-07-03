@@ -18,6 +18,7 @@ int main() {
     usleep(100000);
   }
   
-  destroyFrameBuffer(fb);
+	destroyFrameBuffer(fb);
+	destroyContext(NULL);
   return 0;
 }

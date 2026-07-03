@@ -1,6 +1,8 @@
+#include "_graphics.h"
 #include "graphics.h"
+#include "types.h"
 
-int renderTriangle(renderContext *rc, Point2 *points[3]) {
+void renderTriangle(renderContext *rc, Point2 *points[3]) {
     switch (rc->render_mode) {
     case WIREFRAME: {
         Point2 p1 = *(points[0]);
@@ -65,9 +67,10 @@ int renderTriangle(renderContext *rc, Point2 *points[3]) {
         break;
     }
     }
-    return 0;
+	loadRenderedObjectToContext(rc, newTriangleObject(points, 0, X));
 }
-int renderAngledTriangle(renderContext *rc,Point2 *points[3], float theta, axis ax){
+
+ void renderAngledTriangle(renderContext *rc,Point2 *points[3], float theta, axis ax){
 		Point2 p1 = (*points[0]);
 		Point2 p2 = (*points[1]);
 		Point2 p3 = (*points[2]);
@@ -77,6 +80,6 @@ int renderAngledTriangle(renderContext *rc,Point2 *points[3], float theta, axis 
 
 		Point2* rt_points[3] = {&rt_points_0,&rt_points_1,&rt_points_2};
 
+		loadRenderedObjectToContext(rc, newTriangleObject(points, theta, ax));
 		return renderTriangle(rc, rt_points);
-
 }
