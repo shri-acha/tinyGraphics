@@ -31,15 +31,23 @@ int destroyFrameBuffer(frameBuffer *fb) {
 }
 
 int destroyContext(renderContext* rc) {
-	sceneContext* sc = rc->scene_context;
-	if (sc == NULL) {
+
+	if ( rc == NULL ) {
 		return -1;
 	}
-	for (int i=0;i<sc->no_of_objs;i++) {
-		free(sc->objs);
+	if (rc->scene_context == NULL) {
+		destroyFrameBuffer(rc->frame_buffer);
+		free(rc);
+	}else {
+		sceneContext* sc = rc->scene_context;
+		for (int i=0;i<sc->no_of_objs;i++) {
+			free(sc->objs);
+		}
+
+		destroyFrameBuffer(rc->frame_buffer);
+		free(rc);
+		free(sc);
 	}
-	free(sc);
-	free(rc);
   return 0;
 }
 

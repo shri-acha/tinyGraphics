@@ -8,7 +8,7 @@ Point2 rotatePointDetached(renderContext* rc,int x, int y, float theta, axis ax)
   Point2 rt_pair;
   switch (ax) {
   case Z:
-    rt_pair.x = (y) * sin(theta) + (-x) * cos(theta);
+    rt_pair.x = -(y) * sin(theta) + (x) * cos(theta);
     rt_pair.y = (x) * sin(theta) + (y) * cos(theta);
     break;
   case X:
@@ -143,19 +143,19 @@ void renderAngledCircleDetached(renderContext *rc, Point2 p, int r, float theta,
     while (x1 >= y1) {
 
  
-   Point2 rt_points_0 = rotatePointDetached(rc,x+x1, y+y1, theta, ax);
-   Point2 rt_points_1 = rotatePointDetached(rc,x-x1, y+y1, theta, ax);
-   Point2 rt_points_2 = rotatePointDetached(rc,x+x1, y-y1, theta, ax);
-   Point2 rt_points_3 = rotatePointDetached(rc,x-x1, y-y1, theta, ax);
-   Point2 rt_points_4 = rotatePointDetached(rc,x+y1, y+x1, theta, ax);
-   Point2 rt_points_5 = rotatePointDetached(rc,x+y1, y-x1, theta, ax);
-   Point2 rt_points_6 = rotatePointDetached(rc,x-y1, y+x1, theta, ax);
-   Point2 rt_points_7 = rotatePointDetached(rc,x-y1, y-x1, theta, ax);
+		Point2 rt_points_0 = rotatePointDetached(rc,x+x1, y+y1, theta, ax);
+		Point2 rt_points_1 = rotatePointDetached(rc,x-x1, y+y1, theta, ax);
+		Point2 rt_points_2 = rotatePointDetached(rc,x+x1, y-y1, theta, ax);
+		Point2 rt_points_3 = rotatePointDetached(rc,x-x1, y-y1, theta, ax);
+		Point2 rt_points_4 = rotatePointDetached(rc,x+y1, y+x1, theta, ax);
+		Point2 rt_points_5 = rotatePointDetached(rc,x+y1, y-x1, theta, ax);
+		Point2 rt_points_6 = rotatePointDetached(rc,x-y1, y+x1, theta, ax);
+		Point2 rt_points_7 = rotatePointDetached(rc,x-y1, y-x1, theta, ax);
 
-      renderHorizontalLineDetached(rc, rt_points_1.x, rt_points_0.x, rt_points_0.y);
-      renderHorizontalLineDetached(rc, rt_points_1.x, rt_points_0.x, rt_points_2.y);
-      renderHorizontalLineDetached(rc,rt_points_6.x,rt_points_4.x,rt_points_4.y);
-      renderHorizontalLineDetached(rc, rt_points_7.x,rt_points_5.x,rt_points_5.y);
+		renderLineDetached(rc, rt_points_1, rt_points_0); // top-bottom 
+		renderLineDetached(rc, rt_points_3, rt_points_2); // bottom-top pair
+		renderLineDetached(rc, rt_points_6, rt_points_4); // pair 1
+		renderLineDetached(rc, rt_points_7, rt_points_5); // pair 2
 
       y1++;
       t1 += y1;
