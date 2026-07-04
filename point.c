@@ -11,3 +11,4 @@ int renderPoint(renderContext *rc, Point2 p) {
   rc->frame_buffer->buffer[get_index(rc->frame_buffer, x, y)].color.literal = (uint16_t)0xFFFF;
   return 0;
 }
+

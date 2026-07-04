@@ -13,6 +13,7 @@ int main() {
   Point2 *points[3] = { &p1, &p2, &p3 };
   while (1) {
     renderAngledTriangle(&rc, points, theta, 2);
+	 printf("%d\n",rc.scene_context->no_of_objs);
     formatBuffer(fb);
     usleep(1e5);
     flushPixelBuffer(fb->buffer, fb->width, fb->height);
