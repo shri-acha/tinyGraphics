@@ -26,14 +26,9 @@ int main() {
         .frame_buffer = fb, 
         .render_mode = FILLED,
         .origin = (Index){.x = 400, .y = 400}, 
-        .scene_context = newSceneContext()
+        .scene_context = newSceneContext(),
     };
     float theta = 0.0;
-
-    Point2 p1 = {.x = 200, .y = 0};
-    Point2 p2 = {.x = 100, .y = 200};
-    Point2 p3 = {.x = 400, .y = 400}; 
-    Point2 *points[3] = { &p1, &p2, &p3 };
 
     if (!glfwInit()) return -1;
     
@@ -60,8 +55,10 @@ int main() {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, fb->width, fb->height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
 
     while (!glfwWindowShouldClose(window)) {
-		  // library function
-        renderAngledTriangle(&rc, points, theta, Y);
+		 // library functions
+		 renderLine(&rc,(Point2){.x=0,.y=-200},(Point2){.x=0,.y=200});
+		 renderLine(&rc,(Point2){.x=-200,.y=0},(Point2){.x=200,.y=0});
+		 renderAngledCircle(&rc, (Point2){.x = 0,.y=0}, 100, theta, Z);
         
 		  // binds GL_TEXTURE_2D into textureID
         glBindTexture(GL_TEXTURE_2D, textureID);
@@ -86,7 +83,7 @@ int main() {
         flushPixelBuffer(fb->buffer, fb->width, fb->height);
         flushSceneContext(rc.scene_context);
         
-        theta += M_PI / 12;
+        theta += M_PI / 100;
     }
 
     destroyFrameBuffer(fb);
