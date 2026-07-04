@@ -1,2 +1,2 @@
 opengl: opengl_rendering.c ../*.c
-	gcc opengl_rendering.c ../*.c -lm -lglfw -lGL -o opengl_rendering 
+	gcc opengl_rendering.c ../*.c -lm -lglfw -lGL -o build/opengl_rendering 
