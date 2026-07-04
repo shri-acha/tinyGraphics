@@ -9,34 +9,34 @@
 #include <stdlib.h>
 
 /*Renders a point at (x,y)*/
-int renderPoint(renderContext *rc, Point2 p);
+int renderPoint(renderContext *rc, Point2 p,Color color);
 
 /*Renders line from (x1,y1) to (x2,y2)*/
-void renderLine(renderContext *rc, Point2 p1, Point2 p2);
+void renderLine(renderContext *rc, Point2 p1, Point2 p2,Color color);
 
 /* This directly renders the line without using the conventional bressenham
  * approach, this method is usually superior to bressenham approach as it
  * doesn't move in y direction implicitly */
-void renderHorizontalLine(renderContext *rc, int x1, int x2, int y);
+void renderHorizontalLine(renderContext *rc, int x1, int x2, int y, Color color);
 
 /*
  * Renders a circle of radius r with center at (x,y).
  * Uses Jesko's method to reduce the number of overall operations,
  * optimizing for low performance systems
  */
-void renderCircle(renderContext *rc, Point2 p, int r);
+void renderCircle(renderContext *rc, Point2 p, int r, Color color);
 
 /*
  * Renders a circle of radius r with center at (x,y) rotated about the axis
  * through its center at theta degrees.
  */
 void renderAngledCircle(renderContext *rc, Point2 p, int r, float theta,
-                       axis ax);
+                       axis ax,Color color);
 /*Renders a triangle*/
-void renderTriangle(renderContext *rc, Point2* points[3]);
+void renderTriangle(renderContext *rc, Point2* points[3],Color color);
 
 /*Renders a triangle at an angle of theta with axis*/
-void renderAngledTriangle(renderContext *rc,Point2 *points[3], float theta, axis ax);
+void renderAngledTriangle(renderContext *rc,Point2 *points[3], float theta, axis ax,Color color);
 
 /*Returns an equivalent index of (x,y) in a linear buffer*/
 int get_index(frameBuffer *fb, int x, int y);
@@ -54,7 +54,7 @@ int flushPixelBuffer(pixelBuffer *pb, int width, int height);
 int flushSceneContext(sceneContext* sc);
 
 /*Returns an instance of frameBuffer with width*height with 5R6G5B color*/
-frameBuffer *createFrameBuffer(int width, int height,uint16_t color);
+frameBuffer *createFrameBuffer(int width, int height);
 
 /* Frees the fat pointer of the framebuffer */
 int destroyFrameBuffer(frameBuffer *fb);

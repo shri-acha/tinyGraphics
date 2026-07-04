@@ -12,10 +12,10 @@ renderedObject* newLineObject(Point2 start,Point2 end);
 
 Point2 rotatePointDetached(renderContext* rc,int x, int y, float theta, axis ax);
 
-void renderTriangleDetached(renderContext* rc, Point2 *points[3]);
-void renderLineDetached(renderContext *rc,Point2 p1, Point2 p2);
-void renderHorizontalLineDetached(renderContext *rc, int x1, int x2, int y);
-int renderPointDetached(renderContext *rc, Point2 p);
-void renderCircleDetached(renderContext *rc, Point2 p, int r);
-void renderAngledCircleDetached(renderContext *rc, Point2 p, int r, float theta, axis ax);
-void renderAngledTriangleDetached(renderContext *rc,Point2 *points[3], float theta, axis ax);
+void renderTriangleDetached(renderContext* rc, Point2 *points[3],Color color);
+void renderLineDetached(renderContext *rc,Point2 p1, Point2 p2,Color color);
+void renderHorizontalLineDetached(renderContext *rc, int x1, int x2, int y,Color color);
+int renderPointDetached(renderContext *rc, Point2 p,Color color);
+void renderCircleDetached(renderContext *rc, Point2 p, int r, Color color);
+void renderAngledCircleDetached(renderContext *rc, Point2 p, int r, float theta, axis ax, Color color);
+void renderAngledTriangleDetached(renderContext *rc,Point2 *points[3], float theta, axis ax, Color color);

@@ -3,7 +3,7 @@
 #include <sys/types.h>
 #include "_graphics.h"
 
-frameBuffer *createFrameBuffer(int width, int height, uint16_t color_lit) {
+frameBuffer *createFrameBuffer(int width, int height) {
   pixelBuffer *buffer = calloc(width * height, sizeof(pixelBuffer));
   frameBuffer *fb = (frameBuffer *)malloc(sizeof(frameBuffer));
   fb->height = height;

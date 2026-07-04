@@ -8,9 +8,18 @@ typedef struct {
   int y;
 } Point2;
 
+/// Point3 represents the world coordinates points, i.e. coordinates w.r.t. to the origin defined by the 
+/// RenderingContext
+typedef struct {
+  int x;
+  int y;
+  int z;
+} Point3;
+
 typedef struct {
 	int x;
 	int y;
+	int z;
 } Index;
 
 typedef enum {
@@ -63,6 +72,7 @@ typedef struct {
 	axis ax;
 }Triangle;
 
+/* Is used by the engine to represent the objects within the scene */
 typedef struct {
 	union {
 	Line line;
@@ -77,11 +87,25 @@ typedef struct sceneContext{
 	int no_of_objs; // number of objects registered and currently in scene
 }sceneContext;
 
-/// Render context holds relevant data and contexts required internally or by the user, like sceneContext, that can be passed to 
-/// obtain relevant information about the scene
+/* Defines the projection type used, while in the (3d projection mode) */
+typedef enum {
+	ORTHOGONAL,
+	PERSPECTIVE,
+}projectionMode;
+
+/* Defines the coordinate system used when rendering */
+typedef enum {
+	TW, // 2D 
+	TH, // 3D
+}cameraMode;
+
+/* Render context holds relevant data and contexts required internally or by the user, like sceneContext, that can be passed to 
+ obtain relevant information about the scene */
 typedef struct {
   frameBuffer *frame_buffer;
   renderMode render_mode;
+  projectionMode projection;
+
   Index origin;
   sceneContext* scene_context;
 } renderContext;
