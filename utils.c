@@ -2,11 +2,6 @@
 #include "types.h"
 #include <stdlib.h>
 
-/*Sets the value of the pixel for the pixelBuffer at (x,y) */
-void set_pixel(frameBuffer *fb, pixelBuffer pb, int x, int y) {
-  fb->buffer[get_index(fb, x, y)] = pb;
-}
-
 /*Gets the value of the pixel for the pixelBuffer at (x,y) */
 pixelBuffer get_pixel(frameBuffer *fb, int x, int y) {
   return fb->buffer[get_index(fb, x, y)];

@@ -89,7 +89,7 @@ typedef struct sceneContext{
 
 /* Defines the projection type used, while in the (3d projection mode) */
 typedef enum {
-	ORTHOGONAL,
+	ORTHOGRAPHIC,
 	PERSPECTIVE,
 }projectionMode;
 
@@ -105,7 +105,7 @@ typedef struct {
   frameBuffer *frame_buffer;
   renderMode render_mode;
   projectionMode projection;
-
+  float focal_length;
   Index origin;
   sceneContext* scene_context;
 } renderContext;

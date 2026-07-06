@@ -11,8 +11,6 @@ typedef enum {
 } Operator;
 
 
-void set_pixel(frameBuffer *fb, pixelBuffer pb, int x, int y);
-
 pixelBuffer get_pixel(frameBuffer *fb, int x, int y);
 
 int compare_value(Operator op, int p1, int p2);

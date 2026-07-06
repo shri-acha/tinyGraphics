@@ -4,7 +4,7 @@
 #include "_graphics.h"
 #include "utils.h"
 
-Point2 rotatePointDetached(renderContext* rc,int x, int y, float theta, axis ax) {
+Point2 _rotatePoint2D(renderContext* rc,int x, int y, float theta, axis ax) {
   Point2 rt_pair;
   switch (ax) {
   case Z:
@@ -18,6 +18,30 @@ Point2 rotatePointDetached(renderContext* rc,int x, int y, float theta, axis ax)
   case Y:
     rt_pair.x = (x) * cos(theta);
     rt_pair.y = y;
+    break;
+  default:
+	 break;
+  }
+  return rt_pair;
+}
+
+Point3 _rotatePoint3D(renderContext* rc,int x, int y, int z, float theta, axis ax) {
+  Point3 rt_pair;
+  switch (ax) {
+  case Z:
+    rt_pair.x = -(y) * sin(theta) + (x) * cos(theta);
+    rt_pair.y = (x) * sin(theta) + (y) * cos(theta);
+    rt_pair.z = z;
+    break;
+  case X:
+    rt_pair.x = x;
+    rt_pair.y = (y)* cos(theta) + z*sin(theta);
+    rt_pair.z = -(y)*sin(theta) + z*cos(theta);
+    break;
+  case Y:
+    rt_pair.x = (x) * cos(theta) - (z) * sin(theta);
+    rt_pair.y = y;
+    rt_pair.z = -(x)*sin(theta) + (z)*cos(theta);
     break;
   default:
 	 break;
@@ -60,7 +84,7 @@ renderedObject* newLineObject(Point2 start, Point2 end) {
     return ro;
 }
 
-void renderCircleDetached(renderContext *rc, Point2 p, int r,Color color) {
+void _renderCircle2D(renderContext *rc, Point2 p, int r,Color color) {
   int x1 = r;
   int y1 = 0;
   int x = p.x;
@@ -70,14 +94,14 @@ void renderCircleDetached(renderContext *rc, Point2 p, int r,Color color) {
   case WIREFRAME:
     while (x1 >= y1) {
  
-      renderPointDetached(rc,(Point2) {.x= x + x1,.y= y + y1},color);
-      renderPointDetached(rc,(Point2) {.x= x - x1,.y= y + y1},color);
-      renderPointDetached(rc,(Point2) {.x= x + x1,.y= y - y1},color);
-      renderPointDetached(rc,(Point2) {.x= x - x1,.y= y - y1},color);
-      renderPointDetached(rc,(Point2) {.x= y + y1,.y= x + x1},color);
-      renderPointDetached(rc,(Point2) {.x= y + y1,.y= x - x1},color);
-      renderPointDetached(rc,(Point2) {.x= y - y1,.y= x + x1},color);
-      renderPointDetached(rc,(Point2) {.x= y - y1,.y= x - x1},color);
+     _renderPoint2D(rc,(Point2) {.x= x + x1,.y= y + y1},color);
+     _renderPoint2D(rc,(Point2) {.x= x - x1,.y= y + y1},color);
+     _renderPoint2D(rc,(Point2) {.x= x + x1,.y= y - y1},color);
+     _renderPoint2D(rc,(Point2) {.x= x - x1,.y= y - y1},color);
+     _renderPoint2D(rc,(Point2) {.x= y + y1,.y= x + x1},color);
+     _renderPoint2D(rc,(Point2) {.x= y + y1,.y= x - x1},color);
+     _renderPoint2D(rc,(Point2) {.x= y - y1,.y= x + x1},color);
+     _renderPoint2D(rc,(Point2) {.x= y - y1,.y= x - x1},color);
                               
       y1++;                   
       t1 += y1;
@@ -91,10 +115,10 @@ void renderCircleDetached(renderContext *rc, Point2 p, int r,Color color) {
   case FILLED:
     while (x1 >= y1) {
 
-      renderHorizontalLineDetached(rc, x - x1, x + x1, y + y1,color);
-      renderHorizontalLineDetached(rc, x - x1, x + x1, y - y1,color);
-      renderHorizontalLineDetached(rc, x - y1, x + y1, y + x1,color);
-      renderHorizontalLineDetached(rc, x - y1, x + y1, y - x1,color);
+     _renderHorizontalLine2D(rc, x - x1, x + x1, y + y1,color);
+     _renderHorizontalLine2D(rc, x - x1, x + x1, y - y1,color);
+     _renderHorizontalLine2D(rc, x - y1, x + y1, y + x1,color);
+     _renderHorizontalLine2D(rc, x - y1, x + y1, y - x1,color);
 
       y1++;
       t1 += y1;
@@ -110,7 +134,7 @@ void renderCircleDetached(renderContext *rc, Point2 p, int r,Color color) {
   return;
 }
 
-void renderAngledCircleDetached(renderContext *rc, Point2 p, int r, float theta, axis ax,Color color) {
+void _renderAngledCircle2D(renderContext *rc, Point2 p, int r, float theta, axis ax,Color color) {
   int x1 = r;
   int y1 = 0;
   float t1 = r >> 4;
@@ -121,14 +145,14 @@ void renderAngledCircleDetached(renderContext *rc, Point2 p, int r, float theta,
   case WIREFRAME:
     while (x1 >= y1) {
 
-      renderPointDetached(rc,rotatePointDetached(rc,x+x1, y+y1, theta, ax),color);
-      renderPointDetached(rc,rotatePointDetached(rc,x-x1, y+y1, theta, ax),color);
-      renderPointDetached(rc,rotatePointDetached(rc,x+x1, y-y1, theta, ax),color);
-      renderPointDetached(rc,rotatePointDetached(rc,x-x1, y-y1, theta, ax),color);
-      renderPointDetached(rc,rotatePointDetached(rc,x+y1, y+x1, theta, ax),color);
-      renderPointDetached(rc,rotatePointDetached(rc,x+y1, y-x1, theta, ax),color);
-      renderPointDetached(rc,rotatePointDetached(rc,x-y1, y+x1, theta, ax),color);
-      renderPointDetached(rc,rotatePointDetached(rc,x-y1, y-x1, theta, ax),color);
+      _renderPoint2D(rc,_rotatePoint2D(rc,x+x1, y+y1, theta, ax),color);
+      _renderPoint2D(rc,_rotatePoint2D(rc,x-x1, y+y1, theta, ax),color);
+      _renderPoint2D(rc,_rotatePoint2D(rc,x+x1, y-y1, theta, ax),color);
+      _renderPoint2D(rc,_rotatePoint2D(rc,x-x1, y-y1, theta, ax),color);
+      _renderPoint2D(rc,_rotatePoint2D(rc,x+y1, y+x1, theta, ax),color);
+      _renderPoint2D(rc,_rotatePoint2D(rc,x+y1, y-x1, theta, ax),color);
+      _renderPoint2D(rc,_rotatePoint2D(rc,x-y1, y+x1, theta, ax),color);
+      _renderPoint2D(rc,_rotatePoint2D(rc,x-y1, y-x1, theta, ax),color);
 
       y1++;
       t1 += y1;
@@ -143,19 +167,19 @@ void renderAngledCircleDetached(renderContext *rc, Point2 p, int r, float theta,
     while (x1 >= y1) {
 
  
-		Point2 rt_points_0 = rotatePointDetached(rc,x+x1, y+y1, theta, ax);
-		Point2 rt_points_1 = rotatePointDetached(rc,x-x1, y+y1, theta, ax);
-		Point2 rt_points_2 = rotatePointDetached(rc,x+x1, y-y1, theta, ax);
-		Point2 rt_points_3 = rotatePointDetached(rc,x-x1, y-y1, theta, ax);
-		Point2 rt_points_4 = rotatePointDetached(rc,x+y1, y+x1, theta, ax);
-		Point2 rt_points_5 = rotatePointDetached(rc,x+y1, y-x1, theta, ax);
-		Point2 rt_points_6 = rotatePointDetached(rc,x-y1, y+x1, theta, ax);
-		Point2 rt_points_7 = rotatePointDetached(rc,x-y1, y-x1, theta, ax);
+		Point2 rt_points_0 =_rotatePoint2D(rc,x+x1, y+y1, theta, ax);
+		Point2 rt_points_1 =_rotatePoint2D(rc,x-x1, y+y1, theta, ax);
+		Point2 rt_points_2 =_rotatePoint2D(rc,x+x1, y-y1, theta, ax);
+		Point2 rt_points_3 =_rotatePoint2D(rc,x-x1, y-y1, theta, ax);
+		Point2 rt_points_4 =_rotatePoint2D(rc,x+y1, y+x1, theta, ax);
+		Point2 rt_points_5 =_rotatePoint2D(rc,x+y1, y-x1, theta, ax);
+		Point2 rt_points_6 =_rotatePoint2D(rc,x-y1, y+x1, theta, ax);
+		Point2 rt_points_7 =_rotatePoint2D(rc,x-y1, y-x1, theta, ax);
 
-		renderLineDetached(rc, rt_points_1, rt_points_0,color); // top-bottom 
-		renderLineDetached(rc, rt_points_3, rt_points_2,color); // bottom-top pair
-		renderLineDetached(rc, rt_points_6, rt_points_4,color); // pair 1
-		renderLineDetached(rc, rt_points_7, rt_points_5,color); // pair 2
+		_renderLine2D(rc, rt_points_1, rt_points_0,color); // top-bottom 
+		_renderLine2D(rc, rt_points_3, rt_points_2,color); // bottom-top pair
+		_renderLine2D(rc, rt_points_6, rt_points_4,color); // pair 1
+		_renderLine2D(rc, rt_points_7, rt_points_5,color); // pair 2
 
       y1++;
       t1 += y1;
@@ -169,7 +193,7 @@ void renderAngledCircleDetached(renderContext *rc, Point2 p, int r, float theta,
   loadRenderedObjectToContext(rc, newCircleObject(r, theta, p, ax));
 }
 
-void renderLineDetached(renderContext *rc,Point2 p1, Point2 p2,Color color){
+void _renderLine2D(renderContext *rc,Point2 p1, Point2 p2,Color color){
   int x1 = p1.x,y1 = p1.y;
   int x2 = p2.x,y2 = p2.y;
 
@@ -180,7 +204,7 @@ void renderLineDetached(renderContext *rc,Point2 p1, Point2 p2,Color color){
   int err = dx + dy;
 
   while (1) {
-    renderPointDetached(rc,(Point2){.x=x1,.y=y1},color);
+    _renderPoint2D(rc,(Point2){.x=x1,.y=y1},color);
     if (x1 == x2 && y1 == y2)
       break;
     int e2 = 2 * err;
@@ -194,7 +218,7 @@ void renderLineDetached(renderContext *rc,Point2 p1, Point2 p2,Color color){
     }
   }
 }
-void renderHorizontalLineDetached(renderContext *rc, int x1, int x2, int y,Color color) {
+void _renderHorizontalLine2D(renderContext *rc, int x1, int x2, int y,Color color) {
   if (x1 > x2) {
     int tmp = x1;
     x1 = x2;
@@ -202,20 +226,20 @@ void renderHorizontalLineDetached(renderContext *rc, int x1, int x2, int y,Color
   }
 
   for (int i = x1; i <= x2; i++) {
-    renderPointDetached(rc,(Point2){.x=i,.y=y},color);
+    _renderPoint2D(rc,(Point2){.x=i,.y=y},color);
   }
 }
 
 /* This is an internal purely rendering function that doesn't affect the context*/
-void renderTriangleDetached(renderContext* rc, Point2 *points[3],Color color){
+void _renderTriangle2D(renderContext* rc, Point2 *points[3],Color color){
     switch (rc->render_mode) {
     case WIREFRAME: {
         Point2 p1 = *(points[0]);
         Point2 p2 = *(points[1]);
         Point2 p3 = *(points[2]);
-        renderLineDetached(rc, p1, p2,color);
-        renderLineDetached(rc, p2, p3,color);
-        renderLineDetached(rc, p3, p1,color);
+        _renderLine2D(rc, p1, p2,color);
+        _renderLine2D(rc, p2, p3,color);
+        _renderLine2D(rc, p3, p1,color);
         break;
     }
     case FILLED: {
@@ -241,9 +265,9 @@ void renderTriangleDetached(renderContext* rc, Point2 *points[3],Color color){
 
             for (int y_scan = y1; y_scan < y2; y_scan++) {
                 if (x_left >= x_right) {
-                    renderHorizontalLineDetached(rc, (int)x_right, (int)x_left, y_scan,color);
+                    _renderHorizontalLine2D(rc, (int)x_right, (int)x_left, y_scan,color);
                 } else {
-                    renderHorizontalLineDetached(rc, (int)x_left, (int)x_right, y_scan,color);
+                    _renderHorizontalLine2D(rc, (int)x_left, (int)x_right, y_scan,color);
                 }
                 x_left += change_x_left;
                 x_right += change_x_right;
@@ -261,9 +285,9 @@ void renderTriangleDetached(renderContext* rc, Point2 *points[3],Color color){
 
             for (int y_scan = y2; y_scan < y3; y_scan++) {
                 if (x_left >= x_right) {
-                    renderHorizontalLineDetached(rc, (int)x_right, (int)x_left, y_scan,color);
+                    _renderHorizontalLine2D(rc, (int)x_right, (int)x_left, y_scan,color);
                 } else {
-                    renderHorizontalLineDetached(rc, (int)x_left, (int)x_right, y_scan,color);
+                    _renderHorizontalLine2D(rc, (int)x_left, (int)x_right, y_scan,color);
                 }
                 x_left += change_x_left;
                 x_right += change_x_right;
@@ -274,29 +298,125 @@ void renderTriangleDetached(renderContext* rc, Point2 *points[3],Color color){
     }
 }
 
-int renderPointDetached(renderContext *rc, Point2 p,Color color) {
+void _renderPoint2D(renderContext *rc, Point2 p,Color color) {
   int x = p.x+ rc->origin.x ,y = p.y + rc->origin.y;
   int width = rc->frame_buffer->width;
   int height = rc->frame_buffer->height;
 
   if (x > width || y > height || x < 0 || y < 0) {
-    return -1;
+    return;
   }
   rc->frame_buffer->buffer[get_index(rc->frame_buffer, x, y)].color = color;
-  return 0;
+  return;
 }
 
-void renderAngledTriangleDetached(renderContext* rc, Point2* points[3],float theta, axis ax,Color color) {
+void _renderAngledTriangle2D(renderContext* rc, Point2* points[3],float theta, axis ax,Color color) {
 		Point2 p1 = (*points[0]);
 		Point2 p2 = (*points[1]);
 		Point2 p3 = (*points[2]);
-      Point2 rt_points_0 = rotatePointDetached(rc,p1.x, p1.y, theta, ax);
-      Point2 rt_points_1 = rotatePointDetached(rc,p2.x, p2.y, theta, ax);
-      Point2 rt_points_2 = rotatePointDetached(rc,p3.x, p3.y, theta, ax);
+      Point2 rt_points_0 = _rotatePoint2D(rc,p1.x, p1.y, theta, ax);
+      Point2 rt_points_1 = _rotatePoint2D(rc,p2.x, p2.y, theta, ax);
+      Point2 rt_points_2 = _rotatePoint2D(rc,p3.x, p3.y, theta, ax);
 
 		Point2* rt_points[3] = {&rt_points_0,&rt_points_1,&rt_points_2};
 
 		loadRenderedObjectToContext(rc, newTriangleObject(points, theta, ax));
-		return renderTriangleDetached(rc, rt_points,color);
+		return _renderTriangle2D(rc, rt_points,color);
 
+}
+
+int projectPoint(renderContext *rc, Point3 p, int *screen_x, int *screen_y) {
+    if (rc->projection == PERSPECTIVE) {
+        if (p.z <= 0.1f) return 0;
+        *screen_x = (int)((p.x * rc->focal_length) / p.z) + rc->origin.x;
+        *screen_y = (int)((p.y * rc->focal_length) / p.z) + rc->origin.y;
+    } else {
+        *screen_x = (int)p.x + rc->origin.x;
+        *screen_y = (int)p.y + rc->origin.y;
+    }
+    return 1;
+}
+
+void _renderLine3D(renderContext* rc, Point3 p1, Point3 p2, Color color) {
+    int sx1, sy1, sx2, sy2;
+
+    if (rc->projection == PERSPECTIVE) {
+
+        sx1 = (int)(((float)p1.x * (float)rc->focal_length) / (float)p1.z) + rc->origin.x;
+        sy1 = (int)(((float)p1.y * (float)rc->focal_length) / (float)p1.z) + rc->origin.y;
+        
+        sx2 = (int)(((float)p2.x * (float)rc->focal_length) / (float)p2.z) + rc->origin.x;
+        sy2 = (int)(((float)p2.y * (float)rc->focal_length) / (float)p2.z) + rc->origin.y;
+    } else {
+        sx1 = (int)p1.x + rc->origin.x;
+        sy1 = (int)p1.y + rc->origin.y;
+        sx2 = (int)p2.x + rc->origin.x;
+        sy2 = (int)p2.y + rc->origin.y;
+    }
+
+    int dx = abs(sx2 - sx1);
+    int dy = -abs(sy2 - sy1);
+    int sx = sx1 < sx2 ? 1 : -1;
+    int sy = sy1 < sy2 ? 1 : -1;
+    int err = dx + dy;
+
+    int total_steps = (dx > -dy) ? dx : -dy;
+    float current_z = p1.z;
+    float z_step = (total_steps == 0) ? 0 : (p2.z - p1.z) / (float)total_steps;
+
+    while (1) {
+        Point3 screen_point = {
+            .x = sx1 - rc->origin.x,
+            .y = sy1 - rc->origin.y,
+            .z = current_z - rc->origin.z
+        };
+        
+        _renderPoint3D(rc, screen_point, color);
+
+        if (sx1 == sx2 && sy1 == sy2)
+            break;
+            
+        int e2 = 2 * err;
+        if (e2 >= dy) {
+            err += dy;
+            sx1 += sx;
+        }
+        if (e2 <= dx) {
+            err += dx;
+            sy1 += sy;
+        }
+        
+        current_z += z_step;
+    }
+}
+int _drawPixel(renderContext *rc, int x, int y,Color color) {
+  int width = rc->frame_buffer->width;
+  int height = rc->frame_buffer->height;
+
+  if (x >= width || y >= height || x < 0 || y < 0) {
+    return -1;
+  }
+
+  rc->frame_buffer->buffer[get_index(rc->frame_buffer, x, y)].color = color;
+  return 0;
+}
+
+void _renderPoint3D(renderContext *rc, Point3 p,Color color) {
+	int screenX,screenY,depth = p.z;
+
+	switch (rc->projection) {
+		case PERSPECTIVE:
+			screenX = (int) ((p.x*rc->focal_length) / p.z) + rc->origin.x;
+			screenY = (int) ((p.y*rc->focal_length) / p.z) + rc->origin.y;
+			break;
+		case ORTHOGRAPHIC: 
+			screenX = (int) p.x + rc->origin.x;
+			screenY = (int) p.y + rc->origin.y;
+			break;
+		default:
+			return;
+	}
+
+	_drawPixel(rc, screenX, screenY, color);
+	return;
 }
