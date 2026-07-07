@@ -18,4 +18,3 @@ int compare_value(Operator op, int p1, int p2);
 int get_index(frameBuffer *fb, int x, int y);
 
 int sort_point2(Point2** points,size_t points_len);
-

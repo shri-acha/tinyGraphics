@@ -38,8 +38,15 @@ void renderAngledCircle2D(renderContext *rc, Point2 p, int r, float theta,
 /*Renders a triangle*/
 void renderTriangle2D(renderContext *rc, Point2* points[3],Color color);
 
+/*Renders a triangle in 3D space*/
+void renderTriangle3D(renderContext *rc, Point3* points[3],Color color);
+
 /*Renders a triangle at an angle of theta with axis*/
 void renderAngledTriangle2D(renderContext *rc,Point2 *points[3], float theta, axis ax,Color color);
+
+
+/*Renders a triangle in 3D space at an angle of theta with axis*/
+void renderAngledTriangle3D(renderContext *rc,Point3 *points[3], float theta, axis ax,Color color);
 
 /*Returns an equivalent index of (x,y) in a linear buffer*/
 int get_index(frameBuffer *fb, int x, int y);

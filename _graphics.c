@@ -337,25 +337,30 @@ int projectPoint(renderContext *rc, Point3 p, int *screen_x, int *screen_y) {
     return 1;
 }
 
-void _renderLine3D(renderContext* rc, Point3 p1, Point3 p2, Color color) {
-    int sx1, sy1, sx2, sy2;
+Point2 _project3D(renderContext* rc, Point3 p) {
 
+    int sx1, sy1;
     if (rc->projection == PERSPECTIVE) {
-
-        sx1 = (int)(((float)p1.x * (float)rc->focal_length) / (float)p1.z) + rc->origin.x;
-        sy1 = (int)(((float)p1.y * (float)rc->focal_length) / (float)p1.z) + rc->origin.y;
+        sx1 = (int)(((float)p.x * (float)rc->focal_length) / (float)p.z) + rc->origin.x;
+        sy1 = (int)(((float)p.y * (float)rc->focal_length) / (float)p.z) + rc->origin.y;
         
-        sx2 = (int)(((float)p2.x * (float)rc->focal_length) / (float)p2.z) + rc->origin.x;
-        sy2 = (int)(((float)p2.y * (float)rc->focal_length) / (float)p2.z) + rc->origin.y;
     } else {
-        sx1 = (int)p1.x + rc->origin.x;
-        sy1 = (int)p1.y + rc->origin.y;
-        sx2 = (int)p2.x + rc->origin.x;
-        sy2 = (int)p2.y + rc->origin.y;
+        sx1 = (int)p.x + rc->origin.x;
+        sy1 = (int)p.y + rc->origin.y;
     }
+	 return (Point2) {.x = sx1,.y=sy1};
+
+}
+
+void _renderLine3D(renderContext* rc, Point3 p1, Point3 p2, Color color) {
+	 Point2 projected_1,projected_2;
+	 projected_1 = _project3D(rc,p1);
+	 projected_2 = _project3D(rc,p2);
+	 int sx1 = projected_1.x,sx2=projected_2.x,sy1=projected_1.y,sy2=projected_2.y;
 
     int dx = abs(sx2 - sx1);
     int dy = -abs(sy2 - sy1);
+
     int sx = sx1 < sx2 ? 1 : -1;
     int sy = sy1 < sy2 ? 1 : -1;
     int err = dx + dy;
@@ -389,6 +394,7 @@ void _renderLine3D(renderContext* rc, Point3 p1, Point3 p2, Color color) {
         current_z += z_step;
     }
 }
+
 int _drawPixel(renderContext *rc, int x, int y,Color color) {
   int width = rc->frame_buffer->width;
   int height = rc->frame_buffer->height;
@@ -419,4 +425,76 @@ void _renderPoint3D(renderContext *rc, Point3 p,Color color) {
 
 	_drawPixel(rc, screenX, screenY, color);
 	return;
+}
+
+void _renderTriangle3D(renderContext* rc, Point3 *points[3],Color color){
+	 Point2 points_2[3];
+    switch (rc->render_mode) {
+    case WIREFRAME: {
+        Point3 p1 = *(points[0]);
+        Point3 p2 = *(points[1]);
+        Point3 p3 = *(points[2]);
+        _renderLine3D(rc, p1, p2,color);
+        _renderLine3D(rc, p2, p3,color);
+        _renderLine3D(rc, p3, p1,color);
+        break;
+    }
+    case FILLED: {
+			for (int i=0;i<3;i++) {
+				points_2[i] = _project3D(rc, *points[i]);
+			}
+
+        sort_point2( (Point2**) &points_2, 3); 
+
+        int x1 = points_2[0].x, y1 = points_2[0].y;
+        int x2 = points_2[1].x, y2 = points_2[1].y;
+        int x3 = points_2[2].x, y3 = points_2[2].y;
+
+        if (y1 == y3) break; 		  
+		// Since on sorting, points[0] & points[2] are the furthest away from each other, hence, point[1] is the seperating line for rendering the triangle's
+		// top and bottom half.
+		  int y4 = y2; // USING FOR MY SANITY'S SAKE
+        int x4 = x1 + (int)((float)(y4 - y1) * ((float)(x3 - x1) / (float)(y3 - y1)));
+
+		  // USES THE DDA TO RENDER EACH LINE 
+				{
+			  // TOP HALF
+            float x_left = (float)x1;
+            float x_right = (float)x1;
+            float change_x_left = (float)(x2 - x1) / (float)(y2 - y1);
+            float change_x_right = (float)(x4 - x1) / (float)(y2 - y1);
+
+            for (int y_scan = y1; y_scan < y2; y_scan++) {
+                if (x_left >= x_right) {
+                    _renderHorizontalLine2D(rc, (int)x_right, (int)x_left, y_scan,color);
+                } else {
+                    _renderHorizontalLine2D(rc, (int)x_left, (int)x_right, y_scan,color);
+                }
+                x_left += change_x_left;
+                x_right += change_x_right;
+            }
+        }
+
+        {
+
+			  // BOTTOM HALF
+            float x_left = (float)x2;
+            float x_right = (float)x4;
+            
+            float change_x_left = (float)(x3 - x2) / (float)(y3 - y2);
+            float change_x_right = (float)(x3 - x4) / (float)(y3 - y2);
+
+            for (int y_scan = y2; y_scan < y3; y_scan++) {
+                if (x_left >= x_right) {
+                    _renderHorizontalLine2D(rc, (int)x_right, (int)x_left, y_scan,color);
+                } else {
+                    _renderHorizontalLine2D(rc, (int)x_left, (int)x_right, y_scan,color);
+                }
+                x_left += change_x_left;
+                x_right += change_x_right;
+            }
+        }
+        break;
+    }
+    }
 }

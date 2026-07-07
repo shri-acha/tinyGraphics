@@ -25,4 +25,4 @@ void _renderAngledTriangle2D(renderContext *rc,Point2 *points[3], float theta, a
 
 void _renderPoint3D(renderContext *rc, Point3 p,Color color);
 void _renderLine3D(renderContext *rc,Point3 p1, Point3 p2,Color color);
-// void _renderTriangle3D(renderContext *rc, Point3* points[3],Color color);
+void _renderTriangle3D(renderContext *rc, Point3* points[3],Color color);

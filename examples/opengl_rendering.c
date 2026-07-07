@@ -7,7 +7,7 @@ int main() {
     frameBuffer* fb = createFrameBuffer(800, 800);
     renderContext rc = {
         .frame_buffer = fb, 
-        .render_mode = FILLED,
+        .render_mode = WIREFRAME,
         .origin = (Index){.x = 400, .y = 400, .z= 400}, 
         .scene_context = newSceneContext(),
         
@@ -48,6 +48,12 @@ int main() {
         {-50, -50, -50}, { 50, -50, -50}, { 50,  50, -50}, {-50,  50, -50}, // bf 
         {-50, -50,  50}, { 50, -50,  50}, { 50,  50,  50}, {-50,  50,  50}  // ff 
     };
+	 Point3 p1 = (Point3){.x=-50, .y=-50,.z =-50};
+	 Point3 p2 = (Point3) { .x=50, .y=-50, .z=-50};
+	 Point3 p3 = (Point3) { .x=50,  .y=50, .z=-50};
+
+	 Point3* triangle_points[3] = { &p1, &p2, &p3 };
+
     int edges[12][2] = {
         {0, 1}, {1, 2}, {2, 3}, {3, 0}, // bf edges
         {4, 5}, {5, 6}, {6, 7}, {7, 4}, // ff edges 
@@ -91,6 +97,7 @@ int main() {
 				 depth_color.literal = (red << 11) | (green << 5) | blue;
 
 				 renderLine3D(&rc, p1, p2, depth_color);
+				 renderAngledTriangle3D(&rc, triangle_points,theta,Y,depth_color);
 			}
 
          glBindTexture(GL_TEXTURE_2D, textureID);
