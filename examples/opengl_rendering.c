@@ -10,10 +10,10 @@ int main() {
         .render_mode = WIREFRAME,
         .origin = (Index){.x = 400, .y = 400, .z= 400}, 
         .scene_context = newSceneContext(),
+		  .camera_position= (Point3) {.x=0,.y=0,.z=200},
+        .projection = PERSPECTIVE, 
         
-        .projection = ORTHOGRAPHIC, 
-        
-        .focal_length = 10.0f, 
+        .focal_length = 100.0f, 
     };
     float theta = 0.0;
 
@@ -43,14 +43,10 @@ int main() {
 
     // initializing the texture to null
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, fb->width, fb->height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
-    
-    Point3 local_vertices[8] = {
-        {-50, -50, -50}, { 50, -50, -50}, { 50,  50, -50}, {-50,  50, -50}, // bf 
-        {-50, -50,  50}, { 50, -50,  50}, { 50,  50,  50}, {-50,  50,  50}  // ff 
-    };
-	 Point3 p1 = (Point3){.x=-50, .y=-50,.z =-50};
-	 Point3 p2 = (Point3) { .x=50, .y=-50, .z=-50};
-	 Point3 p3 = (Point3) { .x=50,  .y=50, .z=-50};
+
+	 Point3 p1 = (Point3){.x=-50, .y=-50,.z =0};
+	 Point3 p2 = (Point3) { .x=50, .y=-50, .z=0};
+	 Point3 p3 = (Point3) { .x=50,  .y=50, .z=0};
 
 	 Point3* triangle_points[3] = { &p1, &p2, &p3 };
 
@@ -61,44 +57,15 @@ int main() {
     };
 
     while (!glfwWindowShouldClose(window)) {
-			Point3 transformed_vertices[8];
+			Color depth_color;
+			 uint16_t red   = 0;                                 
+			 uint16_t green = (uint16_t)(63) & 0x3F;         
+			 uint16_t blue  = (uint16_t)(31) & 0x1F;         	 
+			 depth_color.literal = (red << 11) | (green << 5) | blue;
 
-			float dynamic_z_offset = 250.0f + sinf(theta * 0.5f) * 100.0f;
-
-			for (int i = 0; i < 8; i++) {
-				 float x1 = local_vertices[i].x * cosf(theta) - local_vertices[i].z * sinf(theta);
-				 float z1 = local_vertices[i].x * sinf(theta) + local_vertices[i].z * cosf(theta);
-
-				 float y2 = local_vertices[i].y * cosf(theta * 0.5f) - z1 * sinf(theta * 0.5f);
-				 float z2 = local_vertices[i].y * sinf(theta * 0.5f) + z1 * cosf(theta * 0.5f);
-
-				 transformed_vertices[i] = (Point3){
-					  .x = x1,
-					  .y = y2,
-					  .z = z2 + dynamic_z_offset 
-				 };
-			}
-
-			for (int i = 0; i < 12; i++) {
-				 Point3 p1 = transformed_vertices[edges[i][0]];
-				 Point3 p2 = transformed_vertices[edges[i][1]];
-
-				 float avg_z = (p1.z + p2.z) / 2.0f;
-
-				 float t = (430.0f - avg_z) / (430.0f - 120.0f);
-				 if (t > 1.0f) t = 1.0f;
-				 if (t < 0.1f) t = 0.1f; 
-
-				 uint16_t red   = 0;                                 // 5 bits
-				 uint16_t green = (uint16_t)(63 * t) & 0x3F;         // 6 bits
-				 uint16_t blue  = (uint16_t)(31 * t) & 0x1F;         // 5 bits
-				 
-				 Color depth_color;
-				 depth_color.literal = (red << 11) | (green << 5) | blue;
-
-				 renderLine3D(&rc, p1, p2, depth_color);
-				 renderAngledTriangle3D(&rc, triangle_points,theta,Y,depth_color);
-			}
+			renderLine3D(&rc,(Point3){.x=-400,.y=0,.z=0},(Point3){.x=400,.y=0,.z=0},depth_color);
+			renderLine3D(&rc,(Point3){.x=0,.y=-400,.z=0},(Point3){.x=0,.y=400,.z=0},depth_color);
+			renderAngledTriangle3D(&rc,triangle_points,theta,X,depth_color);
 
          glBindTexture(GL_TEXTURE_2D, textureID);
          glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, fb->width, fb->height, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, fb->buffer);

@@ -108,4 +108,5 @@ typedef struct {
   float focal_length;
   Index origin;
   sceneContext* scene_context;
+  Point3 camera_position;
 } renderContext;

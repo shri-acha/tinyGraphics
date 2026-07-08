@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "_graphics.h"
 #include "utils.h"
+#include <stdio.h>
 
 Point2 _rotatePoint2D(renderContext* rc,int x, int y, float theta, axis ax) {
   Point2 rt_pair;
@@ -260,8 +261,9 @@ void _renderTriangle2D(renderContext* rc, Point2 *points[3],Color color){
 			  // TOP HALF
             float x_left = (float)x1;
             float x_right = (float)x1;
-            float change_x_left = (float)(x2 - x1) / (float)(y2 - y1);
-            float change_x_right = (float)(x4 - x1) / (float)(y2 - y1);
+
+				float change_x_left = (y2 - y1 != 0) ? (float)(x2 - x1) / (float)(y2 - y1) : 0.0f;
+				float change_x_right = (y2 - y1 != 0) ? (float)(x4 - x1) / (float)(y2 - y1) : 0.0f;
 
             for (int y_scan = y1; y_scan < y2; y_scan++) {
                 if (x_left >= x_right) {
@@ -325,38 +327,27 @@ void _renderAngledTriangle2D(renderContext* rc, Point2* points[3],float theta, a
 
 }
 
-int projectPoint(renderContext *rc, Point3 p, int *screen_x, int *screen_y) {
-    if (rc->projection == PERSPECTIVE) {
-        if (p.z <= 0.1f) return 0;
-        *screen_x = (int)((p.x * rc->focal_length) / p.z) + rc->origin.x;
-        *screen_y = (int)((p.y * rc->focal_length) / p.z) + rc->origin.y;
-    } else {
-        *screen_x = (int)p.x + rc->origin.x;
-        *screen_y = (int)p.y + rc->origin.y;
-    }
-    return 1;
-}
-
 Point2 _project3D(renderContext* rc, Point3 p) {
-
     int sx1, sy1;
     if (rc->projection == PERSPECTIVE) {
-        sx1 = (int)(((float)p.x * (float)rc->focal_length) / (float)p.z) + rc->origin.x;
-        sy1 = (int)(((float)p.y * (float)rc->focal_length) / (float)p.z) + rc->origin.y;
+		 if (p.z == 0.01f ){
+			 sx1 = p.x*rc->focal_length + rc->origin.x;
+			 sy1 = p.y*rc->focal_length + rc->origin.y;
+		 }else {
+			 sx1 = (int)(((float)p.x * (float)rc->focal_length) / ((float)p.z + rc->camera_position.z) + rc->origin.x - rc->camera_position.x);
+			 sy1 = (int)(((float)p.y * (float)rc->focal_length) / ((float)p.z + rc->camera_position.z) + rc->origin.y - rc->camera_position.y);
+		 }
         
     } else {
         sx1 = (int)p.x + rc->origin.x;
         sy1 = (int)p.y + rc->origin.y;
     }
 	 return (Point2) {.x = sx1,.y=sy1};
-
 }
 
 void _renderLine3D(renderContext* rc, Point3 p1, Point3 p2, Color color) {
-	 Point2 projected_1,projected_2;
-	 projected_1 = _project3D(rc,p1);
-	 projected_2 = _project3D(rc,p2);
-	 int sx1 = projected_1.x,sx2=projected_2.x,sy1=projected_1.y,sy2=projected_2.y;
+
+	 int sx1 = p1.x,sx2=p2.x,sy1=p1.y,sy2=p2.y;
 
     int dx = abs(sx2 - sx1);
     int dy = -abs(sy2 - sy1);
@@ -370,13 +361,12 @@ void _renderLine3D(renderContext* rc, Point3 p1, Point3 p2, Color color) {
     float z_step = (total_steps == 0) ? 0 : (p2.z - p1.z) / (float)total_steps;
 
     while (1) {
-        Point3 screen_point = {
-            .x = sx1 - rc->origin.x,
-            .y = sy1 - rc->origin.y,
-            .z = current_z - rc->origin.z
-        };
-        
-        _renderPoint3D(rc, screen_point, color);
+			 Point3 screen_point = {
+				 .x = sx1 ,
+				 .y = sy1 ,
+				 .z = current_z,
+			 };
+			 _renderPoint3D(rc, screen_point, color);
 
         if (sx1 == sx2 && sy1 == sy2)
             break;
@@ -408,27 +398,15 @@ int _drawPixel(renderContext *rc, int x, int y,Color color) {
 }
 
 void _renderPoint3D(renderContext *rc, Point3 p,Color color) {
-	int screenX,screenY,depth = p.z;
-
-	switch (rc->projection) {
-		case PERSPECTIVE:
-			screenX = (int) ((p.x*rc->focal_length) / p.z) + rc->origin.x;
-			screenY = (int) ((p.y*rc->focal_length) / p.z) + rc->origin.y;
-			break;
-		case ORTHOGRAPHIC: 
-			screenX = (int) p.x + rc->origin.x;
-			screenY = (int) p.y + rc->origin.y;
-			break;
-		default:
-			return;
-	}
-
-	_drawPixel(rc, screenX, screenY, color);
+	int screenX,screenY;
+	Point2 projected = _project3D(rc,p);
+	_drawPixel(rc, projected.x, projected.y, color);
 	return;
 }
 
 void _renderTriangle3D(renderContext* rc, Point3 *points[3],Color color){
-	 Point2 points_2[3];
+	 Point2* points_2[3];
+	 Point2 tmp_buff[3];
     switch (rc->render_mode) {
     case WIREFRAME: {
         Point3 p1 = *(points[0]);
@@ -441,14 +419,15 @@ void _renderTriangle3D(renderContext* rc, Point3 *points[3],Color color){
     }
     case FILLED: {
 			for (int i=0;i<3;i++) {
-				points_2[i] = _project3D(rc, *points[i]);
+				 tmp_buff[i] = _project3D(rc, *points[i]);
+				 points_2[i] = &tmp_buff[i];
 			}
 
-        sort_point2( (Point2**) &points_2, 3); 
+        sort_point2(points_2, 3); 
 
-        int x1 = points_2[0].x, y1 = points_2[0].y;
-        int x2 = points_2[1].x, y2 = points_2[1].y;
-        int x3 = points_2[2].x, y3 = points_2[2].y;
+        int x1 = points_2[0]->x, y1 = points_2[0]->y;
+        int x2 = points_2[1]->x, y2 = points_2[1]->y;
+        int x3 = points_2[2]->x, y3 = points_2[2]->y;
 
         if (y1 == y3) break; 		  
 		// Since on sorting, points[0] & points[2] are the furthest away from each other, hence, point[1] is the seperating line for rendering the triangle's
@@ -461,8 +440,10 @@ void _renderTriangle3D(renderContext* rc, Point3 *points[3],Color color){
 			  // TOP HALF
             float x_left = (float)x1;
             float x_right = (float)x1;
-            float change_x_left = (float)(x2 - x1) / (float)(y2 - y1);
-            float change_x_right = (float)(x4 - x1) / (float)(y2 - y1);
+				float change_x_left;
+				float change_x_right;
+				change_x_left = (float)(x2 - x1) / (float)(y2 - y1);
+				change_x_right = (float)(x4 - x1) / (float)(y2 - y1);
 
             for (int y_scan = y1; y_scan < y2; y_scan++) {
                 if (x_left >= x_right) {
