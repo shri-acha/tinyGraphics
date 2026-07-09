@@ -38,13 +38,12 @@ int get_index(frameBuffer *fb, int x, int y) {
 }
 
 int sort_point2(Point2 **points, size_t points_len) {
-  Point2 temp;
-  for (int i = 0; i < points_len - 2; ++i) {
-    for (int j = 1; j < points_len - 1; ++j) {
-      if (compare_value(GT, (*points[j]).y, (*points[i]).y)) {
-        temp = *points[i];
-        points[i] = points[i + 1];
-        *points[i + 1] = temp;
+  for (size_t i = 0; i < points_len - 1; ++i) {
+    for (size_t j = 0; j < points_len - 1 - i; ++j) {
+      if (!compare_value(GT, points[j]->y, points[j + 1]->y)) {
+        Point2 *temp = points[j];
+        points[j] = points[j + 1];
+        points[j + 1] = temp;
       }
     }
   }

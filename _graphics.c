@@ -253,6 +253,7 @@ void _renderTriangle2D(renderContext* rc, Point2 *points[3],Color color){
         if (y1 == y3) break; 		  
 		// Since on sorting, points[0] & points[2] are the furthest away from each other, hence, point[1] is the seperating line for rendering the triangle's
 		// top and bottom half.
+		
 		  int y4 = y2; // USING FOR MY SANITY'S SAKE
         int x4 = x1 + (int)((float)(y4 - y1) * ((float)(x3 - x1) / (float)(y3 - y1)));
 
@@ -265,7 +266,7 @@ void _renderTriangle2D(renderContext* rc, Point2 *points[3],Color color){
 				float change_x_left = (y2 - y1 != 0) ? (float)(x2 - x1) / (float)(y2 - y1) : 0.0f;
 				float change_x_right = (y2 - y1 != 0) ? (float)(x4 - x1) / (float)(y2 - y1) : 0.0f;
 
-            for (int y_scan = y1; y_scan < y2; y_scan++) {
+            for (int y_scan = y1; y_scan <= y2; y_scan++) {
                 if (x_left >= x_right) {
                     _renderHorizontalLine2D(rc, (int)x_right, (int)x_left, y_scan,color);
                 } else {
@@ -282,8 +283,8 @@ void _renderTriangle2D(renderContext* rc, Point2 *points[3],Color color){
             float x_left = (float)x2;
             float x_right = (float)x4;
             
-            float change_x_left = (float)(x3 - x2) / (float)(y3 - y2);
-            float change_x_right = (float)(x3 - x4) / (float)(y3 - y2);
+            float change_x_left = (y3-y2 != 0)?((float)(x3 - x2) / (float)(y3 - y2)):0.0f;
+            float change_x_right = (y3-y2 != 0)?((float)(x3 - x4) / (float)(y3 - y2)):0.0f;
 
             for (int y_scan = y2; y_scan < y3; y_scan++) {
                 if (x_left >= x_right) {
@@ -330,14 +331,8 @@ void _renderAngledTriangle2D(renderContext* rc, Point2* points[3],float theta, a
 Point2 _project3D(renderContext* rc, Point3 p) {
     int sx1, sy1;
     if (rc->projection == PERSPECTIVE) {
-		 if (p.z == 0.01f ){
-			 sx1 = p.x*rc->focal_length + rc->origin.x;
-			 sy1 = p.y*rc->focal_length + rc->origin.y;
-		 }else {
 			 sx1 = (int)(((float)p.x * (float)rc->focal_length) / ((float)p.z + rc->camera_position.z) + rc->origin.x - rc->camera_position.x);
-			 sy1 = (int)(((float)p.y * (float)rc->focal_length) / ((float)p.z + rc->camera_position.z) + rc->origin.y - rc->camera_position.y);
-		 }
-        
+			 sy1 = (int)(((float)p.y * (float)rc->focal_length) / ((float)p.z + rc->camera_position.z) + rc->origin.y - rc->camera_position.y); 
     } else {
         sx1 = (int)p.x + rc->origin.x;
         sy1 = (int)p.y + rc->origin.y;
@@ -429,51 +424,55 @@ void _renderTriangle3D(renderContext* rc, Point3 *points[3],Color color){
         int x2 = points_2[1]->x, y2 = points_2[1]->y;
         int x3 = points_2[2]->x, y3 = points_2[2]->y;
 
-        if (y1 == y3) break; 		  
 		// Since on sorting, points[0] & points[2] are the furthest away from each other, hence, point[1] is the seperating line for rendering the triangle's
 		// top and bottom half.
 		  int y4 = y2; // USING FOR MY SANITY'S SAKE
-        int x4 = x1 + (int)((float)(y4 - y1) * ((float)(x3 - x1) / (float)(y3 - y1)));
+        int x4 = (y3-y1 != 0)?( x1 + (int)((float)(y4 - y1) * ((float)(x3 - x1) / (float)(y3 - y1))) ):0;
 
 		  // USES THE DDA TO RENDER EACH LINE 
 				{
 			  // TOP HALF
             float x_left = (float)x1;
             float x_right = (float)x1;
-				float change_x_left;
-				float change_x_right;
-				change_x_left = (float)(x2 - x1) / (float)(y2 - y1);
-				change_x_right = (float)(x4 - x1) / (float)(y2 - y1);
 
-            for (int y_scan = y1; y_scan < y2; y_scan++) {
-                if (x_left >= x_right) {
-                    _renderHorizontalLine2D(rc, (int)x_right, (int)x_left, y_scan,color);
-                } else {
-                    _renderHorizontalLine2D(rc, (int)x_left, (int)x_right, y_scan,color);
-                }
-                x_left += change_x_left;
-                x_right += change_x_right;
-            }
+				if ( y2 != y1) {
+				float change_x_left = (y2 - y1 != 0)?((float)(x2 - x1) / (float)(y2 - y1)):((float)(x4 - x1) / (float)(y1 - y2));
+				float change_x_right = (y2 - y1 != 0)?((float)(x4 - x1) / (float)(y2 - y1)):((float)(x4 - x1) / (float)(y1 - y2));
+
+					for (int y_scan = y1; y_scan < y2; y_scan++) {
+						 if (x_left >= x_right) {
+							  _renderHorizontalLine2D(rc, (int)x_right, (int)x_left, y_scan,color);
+						 } else {
+							  _renderHorizontalLine2D(rc, (int)x_left, (int)x_right, y_scan,color);
+						 }
+						 x_left += change_x_left;
+						 x_right += change_x_right;
+
+						 printf("(%f,%d) (%f,%d)\n",x_left,y1,x_right,y2);
+					}
+				}
         }
 
         {
 
 			  // BOTTOM HALF
             float x_left = (float)x2;
-            float x_right = (float)x4;
-            
-            float change_x_left = (float)(x3 - x2) / (float)(y3 - y2);
-            float change_x_right = (float)(x3 - x4) / (float)(y3 - y2);
+				float x_right = (float)x4;
+				if ( y3 != y2) {
+					float change_x_left = (y3-y2 > 0)?((float)(x3 - x2) / (float)(y3 - y2)):((float)(x3 - x2) / (float)(y2 - y3));
+					float change_x_right = (y3-y2 > 0)?((float)(x3 - x4) / (float)(y3 - y2)):((float)(x3 - x2) / (float)(y2 - y3));
 
-            for (int y_scan = y2; y_scan < y3; y_scan++) {
-                if (x_left >= x_right) {
-                    _renderHorizontalLine2D(rc, (int)x_right, (int)x_left, y_scan,color);
-                } else {
-                    _renderHorizontalLine2D(rc, (int)x_left, (int)x_right, y_scan,color);
-                }
-                x_left += change_x_left;
-                x_right += change_x_right;
-            }
+					for (int y_scan = y2; y_scan < y3; y_scan++) {
+						if (x_left >= x_right) {
+							_renderHorizontalLine2D(rc, (int)x_right, (int)x_left, y_scan,color);
+						} else {
+							_renderHorizontalLine2D(rc, (int)x_left, (int)x_right, y_scan,color);
+						}
+						x_left += change_x_left;
+						x_right += change_x_right;
+					}
+				}
+
         }
         break;
     }

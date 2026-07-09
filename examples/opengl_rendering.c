@@ -7,10 +7,10 @@ int main() {
     frameBuffer* fb = createFrameBuffer(800, 800);
     renderContext rc = {
         .frame_buffer = fb, 
-        .render_mode = WIREFRAME,
+        .render_mode = FILLED,
         .origin = (Index){.x = 400, .y = 400, .z= 400}, 
         .scene_context = newSceneContext(),
-		  .camera_position= (Point3) {.x=0,.y=0,.z=200},
+		  .camera_position= (Point3) {.x=200,.y=200,.z=200},
         .projection = PERSPECTIVE, 
         
         .focal_length = 100.0f, 
@@ -50,12 +50,6 @@ int main() {
 
 	 Point3* triangle_points[3] = { &p1, &p2, &p3 };
 
-    int edges[12][2] = {
-        {0, 1}, {1, 2}, {2, 3}, {3, 0}, // bf edges
-        {4, 5}, {5, 6}, {6, 7}, {7, 4}, // ff edges 
-        {0, 4}, {1, 5}, {2, 6}, {3, 7}  // side bridge edges 
-    };
-
     while (!glfwWindowShouldClose(window)) {
 			Color depth_color;
 			 uint16_t red   = 0;                                 
@@ -65,7 +59,7 @@ int main() {
 
 			renderLine3D(&rc,(Point3){.x=-400,.y=0,.z=0},(Point3){.x=400,.y=0,.z=0},depth_color);
 			renderLine3D(&rc,(Point3){.x=0,.y=-400,.z=0},(Point3){.x=0,.y=400,.z=0},depth_color);
-			renderAngledTriangle3D(&rc,triangle_points,theta,X,depth_color);
+			renderAngledTriangle3D(&rc,triangle_points,theta,Y,depth_color);
 
          glBindTexture(GL_TEXTURE_2D, textureID);
          glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, fb->width, fb->height, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, fb->buffer);
