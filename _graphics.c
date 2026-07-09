@@ -302,7 +302,7 @@ void _renderTriangle2D(renderContext* rc, Point2 *points[3],Color color){
 }
 
 void _renderPoint2D(renderContext *rc, Point2 p,Color color) {
-  int x = p.x+ rc->origin.x ,y = p.y + rc->origin.y;
+  int x = p.x + rc->origin.x,y = p.y + rc->origin.y;
   int width = rc->frame_buffer->width;
   int height = rc->frame_buffer->height;
 
@@ -331,8 +331,8 @@ void _renderAngledTriangle2D(renderContext* rc, Point2* points[3],float theta, a
 Point2 _project3D(renderContext* rc, Point3 p) {
     int sx1, sy1;
     if (rc->projection == PERSPECTIVE) {
-			 sx1 = (int)(((float)p.x * (float)rc->focal_length) / ((float)p.z + rc->camera_position.z) + rc->origin.x - rc->camera_position.x);
-			 sy1 = (int)(((float)p.y * (float)rc->focal_length) / ((float)p.z + rc->camera_position.z) + rc->origin.y - rc->camera_position.y); 
+			 sx1 = (int)(((float)p.x * (float)rc->focal_length) / ((float)p.z + rc->camera_position.z)  - rc->camera_position.x);
+			 sy1 = (int)(((float)p.y * (float)rc->focal_length) / ((float)p.z + rc->camera_position.z)  - rc->camera_position.y); 
     } else {
         sx1 = (int)p.x + rc->origin.x;
         sy1 = (int)p.y + rc->origin.y;
@@ -395,7 +395,7 @@ int _drawPixel(renderContext *rc, int x, int y,Color color) {
 void _renderPoint3D(renderContext *rc, Point3 p,Color color) {
 	int screenX,screenY;
 	Point2 projected = _project3D(rc,p);
-	_drawPixel(rc, projected.x, projected.y, color);
+	_drawPixel(rc, projected.x + rc->origin.x, projected.y + rc->origin.y, color);
 	return;
 }
 
