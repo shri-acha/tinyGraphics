@@ -4,15 +4,15 @@
 
 int main() {
 
-    frameBuffer* fb = createFrameBuffer(800, 800);
+    frameBuffer* fb = createFrameBuffer(1600, 1600);
     renderContext rc = {
         .frame_buffer = fb, 
         .render_mode = WIREFRAME,
-        .origin = (Index){.x = 400, .y = 400, .z= 400}, 
+        .origin = (Index){.x = 800, .y = 800, .z= 800}, 
         .scene_context = newSceneContext(),
-        .camera_position= (Point3) {.x=0,.y=0,.z=100},
+        .camera_position= (Point3) {.x=0,.y=0,.z=200},
         .projection = PERSPECTIVE, 
-        .focal_length = 100.0f, 
+        .focal_length = 150.0f, 
     };
     float theta = 0.0;
 
@@ -37,11 +37,9 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    // Initializing the texture to null
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, fb->width, fb->height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
 
-    // --- Define 3D Square Pyramid Vertices ---
-    Point3 apex       = (Point3){.x = 0,   .y = 60,  .z = 0};   // Top point
+    Point3 apex       = (Point3){.x = 0,   .y = 100,  .z = 0};   // Top point
     Point3 front_left = (Point3){.x = -55, .y = -40, .z = -55}; // Base corner 1
     Point3 front_right= (Point3){.x = 55,  .y = -40, .z = -55}; // Base corner 2
     Point3 back_right = (Point3){.x = 55,  .y = -40, .z = 55};  // Base corner 3
