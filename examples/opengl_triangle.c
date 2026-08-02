@@ -7,14 +7,14 @@ int main() {
     frameBuffer* fb = createFrameBuffer(1600, 1600);
     renderContext rc = {
         .frame_buffer = fb, 
-        .render_mode = FILLED,
+        .render_mode = WIREFRAME, 
         .origin = (Index){.x = 800, .y = 800, .z= 800}, 
         .scene_context = newSceneContext(),
         .camera_position= (Point3) {.x=0,.y=0,.z=200},
         .projection = PERSPECTIVE, 
         .focal_length = 400.0f, 
     };
-    float theta = 0.0;
+    float theta = M_PI/2;
 
     if (!glfwInit()) return -1;
     
@@ -53,7 +53,7 @@ int main() {
 		  
 		  Point3 *points[3] = { &p1, &p2, &p3 };
 
-		 renderAngledTriangle3D(&rc, points, theta, Y, grid_color);
+		 renderAngledTriangle3D(&rc, points, theta, Z, grid_color);
 
         glBindTexture(GL_TEXTURE_2D, textureID);
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, fb->width, fb->height, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, fb->buffer);
@@ -71,10 +71,7 @@ int main() {
         glfwPollEvents();
 
         flushPixelBuffer(fb->buffer, fb->width, fb->height);
-        flushSceneContext(rc.scene_context);
-        
-        // Speed control for the rotation
-        theta += M_PI / 160.0f;
+        flushSceneContext(rc.scene_context);    
     }
 
     destroyFrameBuffer(fb);

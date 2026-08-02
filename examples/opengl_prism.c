@@ -8,7 +8,7 @@ int main() {
     renderContext rc = {
         .frame_buffer = fb, 
         .render_mode = WIREFRAME,
-        .origin = (Index){.x = 800, .y = 800, .z= 800}, 
+        .origin = (Index){.x = 600, .y = 600, .z= 800}, 
         .scene_context = newSceneContext(),
         .camera_position= (Point3) {.x=0,.y=0,.z=200},
         .projection = PERSPECTIVE, 

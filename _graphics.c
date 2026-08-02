@@ -5,6 +5,7 @@
 #include "utils.h"
 #include <stdio.h>
 
+
 Point2 _rotatePoint2D(renderContext* rc,int x, int y, float theta, axis ax) {
   Point2 rt_pair;
   switch (ax) {

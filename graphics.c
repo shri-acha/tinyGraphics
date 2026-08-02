@@ -1,7 +1,6 @@
 #include "graphics.h"
 #include "types.h"
 #include <sys/types.h>
-#include "_graphics.h"
 
 frameBuffer *createFrameBuffer(int width, int height) {
   pixelBuffer *buffer = calloc(width * height, sizeof(pixelBuffer));
@@ -82,7 +81,7 @@ void formatBuffer(frameBuffer *fb) {
 	printf("\x1B[H");
 }
 
-int drawPixel(renderContext *rc, int x, int y, int z,Color color) {
+int drawPixel(renderContext *rc, int x, int y,Color color) {
   int width = rc->frame_buffer->width;
   int height = rc->frame_buffer->height;
 

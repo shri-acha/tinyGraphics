@@ -16,6 +16,19 @@ typedef struct {
   int z;
 } Point3;
 
+/// Vector4 is an internal struct representation used for storing 3D
+/// point with scale value 'w'.
+typedef struct{
+	int inner[4];
+}Vector4;
+
+/// Matrix3 is a 4x4 matrix as opposed to its name Matrix3, 
+/// as 3 mentions the 3-dimensional requirement but 4x4 matrix
+/// satisfies the 
+typedef struct{
+	int inner[4][4];
+}Matrix3;
+
 typedef struct {
 	int x;
 	int y;
