@@ -370,9 +370,11 @@ Point2 _project3D(renderContext* rc, Point3 p) {
         if (w != 0.0f) {
             v_proj.inner[0] /= w;
             v_proj.inner[1] /= w;
+            v_proj.inner[2] /= w;
+            v_proj.inner[3] = 1.0f;
         }
-        tinyMatrix cameraTrans = getTranslationMatrix(-(float)rc->camera_position.x, -(float)rc->camera_position.y, 0.0f);
-        tinyVec v_final = matrixVecMul(cameraTrans, v_proj);
+        tinyMatrix screenTrans = getTranslationMatrix((float)rc->origin.x - (float)rc->camera_position.x, (float)rc->origin.y - (float)rc->camera_position.y, 0.0f);
+        tinyVec v_final = matrixVecMul(screenTrans, v_proj);
         return vecToPoint2(v_final);
     } else {
         tinyMatrix orthoTrans = getTranslationMatrix((float)rc->origin.x, (float)rc->origin.y, 0.0f);
@@ -434,6 +436,18 @@ int _drawPixel(renderContext *rc, int x, int y,Color color) {
   return 0;
 }
 
+static void _drawHorizontalLineScreen(renderContext *rc, int x1, int x2, int y, Color color) {
+  if (x1 > x2) {
+    int tmp = x1;
+    x1 = x2;
+    x2 = tmp;
+  }
+
+  for (int i = x1; i <= x2; i++) {
+    _drawPixel(rc, i, y, color);
+  }
+}
+
 void _renderPoint3D(renderContext *rc, Point3 p,Color color) {
 	Point2 projected = _project3D(rc,p);
 	_drawPixel(rc, projected.x, projected.y, color);
@@ -483,14 +497,12 @@ void _renderTriangle3D(renderContext* rc, Point3 *points[3],Color color){
 
 					for (int y_scan = y1; y_scan < y2; y_scan++) {
 						 if (x_left >= x_right) {
-							  _renderHorizontalLine2D(rc, (int)x_right, (int)x_left, y_scan,color);
+							  _drawHorizontalLineScreen(rc, (int)x_right, (int)x_left, y_scan,color);
 						 } else {
-							  _renderHorizontalLine2D(rc, (int)x_left, (int)x_right, y_scan,color);
+							  _drawHorizontalLineScreen(rc, (int)x_left, (int)x_right, y_scan,color);
 						 }
 						 x_left += change_x_left;
 						 x_right += change_x_right;
-
-						 printf("(%f,%d) (%f,%d)\n",x_left,y1,x_right,y2);
 					}
 				}
         }
@@ -506,9 +518,9 @@ void _renderTriangle3D(renderContext* rc, Point3 *points[3],Color color){
 
 					for (int y_scan = y2; y_scan < y3; y_scan++) {
 						if (x_left >= x_right) {
-							_renderHorizontalLine2D(rc, (int)x_right, (int)x_left, y_scan,color);
+							_drawHorizontalLineScreen(rc, (int)x_right, (int)x_left, y_scan,color);
 						} else {
-							_renderHorizontalLine2D(rc, (int)x_left, (int)x_right, y_scan,color);
+							_drawHorizontalLineScreen(rc, (int)x_left, (int)x_right, y_scan,color);
 						}
 						x_left += change_x_left;
 						x_right += change_x_right;
