@@ -30,6 +30,11 @@ void renderHorizontalLine2D(renderContext *rc, int x1, int x2, int y, Color colo
 void renderCircle2D(renderContext *rc, Point2 p, int r, Color color);
 
 /*
+ * Renders a circle of radius r with center at (x,y,z).
+ */
+void renderCircle3D(renderContext *rc, Point3 p, int r, Color color);
+
+/*
  * Renders a circle of radius r with center at (x,y) rotated about the axis
  * through its center at theta degrees.
  */
