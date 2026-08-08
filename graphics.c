@@ -56,8 +56,12 @@ int flushPixelBuffer(pixelBuffer *pb, int width, int height) {
 }
 
 int flushSceneContext(sceneContext *sc){
-	sc->no_of_objs = 0;
+	if (sc != NULL) {
+		sc->no_of_objs = 0;
+	}
+	return 0;
 }
+
 
 void formatBuffer(frameBuffer *fb) {
 	for (int j = 0; j < fb->width; j++) {

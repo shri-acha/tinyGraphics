@@ -1,33 +1,30 @@
 #pragma once
 #include <stdint.h>
+#include "tiny_math.h"
 
 /// Point2 represents the world coordinates points, i.e. coordinates w.r.t. to the origin defined by the 
 /// RenderingContext
-typedef struct {
+struct Point2 {
   int x;
   int y;
-} Point2;
+};
 
 /// Point3 represents the world coordinates points, i.e. coordinates w.r.t. to the origin defined by the 
 /// RenderingContext
-typedef struct {
+struct Point3 {
   int x;
   int y;
   int z;
-} Point3;
+};
 
 /// Vector4 is an internal struct representation used for storing 3D
 /// point with scale value 'w'.
-typedef struct{
-	int inner[4];
-}Vector4;
+typedef tinyVec Vector4;
 
 /// Matrix3 is a 4x4 matrix as opposed to its name Matrix3, 
 /// as 3 mentions the 3-dimensional requirement but 4x4 matrix
 /// satisfies the 
-typedef struct{
-	int inner[4][4];
-}Matrix3;
+typedef tinyMatrix Matrix3;
 
 typedef struct {
 	int x;
@@ -35,11 +32,8 @@ typedef struct {
 	int z;
 } Index;
 
-typedef enum {
-	X, //DEFAULT AXIS OF ROTATION
-	Y,
-	Z,
-}axis;
+// axis enum is defined in tiny_math.h
+
 
 // 00000(R) 000000(G) 00000(B)
 typedef struct {

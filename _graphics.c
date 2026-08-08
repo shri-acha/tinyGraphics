@@ -6,50 +6,20 @@
 #include <stdio.h>
 
 
-Point2 _rotatePoint2D(renderContext* rc,int x, int y, float theta, axis ax) {
-  Point2 rt_pair;
-  switch (ax) {
-  case Z:
-    rt_pair.x = -(y) * sin(theta) + (x) * cos(theta);
-    rt_pair.y = (x) * sin(theta) + (y) * cos(theta);
-    break;
-  case X:
-    rt_pair.x = x;
-    rt_pair.y = (y)* cos(theta);
-    break;
-  case Y:
-    rt_pair.x = (x) * cos(theta);
-    rt_pair.y = y;
-    break;
-  default:
-	 break;
-  }
-  return rt_pair;
+Point2 _rotatePoint2D(renderContext* rc, int x, int y, float theta, axis ax) {
+  tinyVec v = point2ToVec((Point2){.x = x, .y = y});
+  tinyMatrix rotM = getRotationMatrix2D(theta, ax);
+  tinyVec res = matrixVecMul(rotM, v);
+  return vecToPoint2(res);
 }
 
-Point3 _rotatePoint3D(renderContext* rc,int x, int y, int z, float theta, axis ax) {
-  Point3 rt_pair;
-  switch (ax) {
-  case Z:
-    rt_pair.x = -(y) * sin(theta) + (x) * cos(theta);
-    rt_pair.y = (x) * sin(theta) + (y) * cos(theta);
-    rt_pair.z = z;
-    break;
-  case X:
-    rt_pair.x = x;
-    rt_pair.y = (y)* cos(theta) + z*sin(theta);
-    rt_pair.z = -(y)*sin(theta) + z*cos(theta);
-    break;
-  case Y:
-    rt_pair.x = (x) * cos(theta) - (z) * sin(theta);
-    rt_pair.y = y;
-    rt_pair.z = -(x)*sin(theta) + (z)*cos(theta);
-    break;
-  default:
-	 break;
-  }
-  return rt_pair;
+Point3 _rotatePoint3D(renderContext* rc, int x, int y, int z, float theta, axis ax) {
+  tinyVec v = point3ToVec((Point3){.x = x, .y = y, .z = z});
+  tinyMatrix rotM = getRotationMatrix3D(theta, ax);
+  tinyVec res = matrixVecMul(rotM, v);
+  return vecToPoint3(res);
 }
+
 
 renderedObject* newCircleObject(int radius,int theta, Point2 center, axis ax) {
 	renderedObject* ro = malloc(sizeof(renderedObject));
@@ -302,12 +272,16 @@ void _renderTriangle2D(renderContext* rc, Point2 *points[3],Color color){
     }
 }
 
-void _renderPoint2D(renderContext *rc, Point2 p,Color color) {
-  int x = p.x + rc->origin.x,y = p.y + rc->origin.y;
+void _renderPoint2D(renderContext *rc, Point2 p, Color color) {
+  tinyVec v = point2ToVec(p);
+  tinyMatrix transM = getTranslationMatrix((float)rc->origin.x, (float)rc->origin.y, 0.0f);
+  tinyVec v_trans = matrixVecMul(transM, v);
+  Point2 p_screen = vecToPoint2(v_trans);
+  int x = p_screen.x, y = p_screen.y;
   int width = rc->frame_buffer->width;
   int height = rc->frame_buffer->height;
 
-  if (x > width || y > height || x < 0 || y < 0) {
+  if (x >= width || y >= height || x < 0 || y < 0) {
     return;
   }
   rc->frame_buffer->buffer[get_index(rc->frame_buffer, x, y)].color = color;
@@ -330,16 +304,32 @@ void _renderAngledTriangle2D(renderContext* rc, Point2* points[3],float theta, a
 }
 
 Point2 _project3D(renderContext* rc, Point3 p) {
-    int sx1, sy1;
+    tinyVec v = point3ToVec(p);
     if (rc->projection == PERSPECTIVE) {
-			 sx1 = (int)(((float)p.x * (float)rc->focal_length) / ((float)p.z + rc->camera_position.z)  - rc->camera_position.x);
-			 sy1 = (int)(((float)p.y * (float)rc->focal_length) / ((float)p.z + rc->camera_position.z)  - rc->camera_position.y); 
+        tinyMatrix perspectiveM = (tinyMatrix){
+            .inner = {
+                { rc->focal_length, 0.0f, 0.0f, 0.0f },
+                { 0.0f, rc->focal_length, 0.0f, 0.0f },
+                { 0.0f, 0.0f, 1.0f, 0.0f },
+                { 0.0f, 0.0f, 1.0f, (float)rc->camera_position.z }
+            }
+        };
+        tinyVec v_proj = matrixVecMul(perspectiveM, v);
+        float w = v_proj.inner[3];
+        if (w != 0.0f) {
+            v_proj.inner[0] /= w;
+            v_proj.inner[1] /= w;
+        }
+        tinyMatrix cameraTrans = getTranslationMatrix(-(float)rc->camera_position.x, -(float)rc->camera_position.y, 0.0f);
+        tinyVec v_final = matrixVecMul(cameraTrans, v_proj);
+        return vecToPoint2(v_final);
     } else {
-        sx1 = (int)p.x + rc->origin.x;
-        sy1 = (int)p.y + rc->origin.y;
+        tinyMatrix orthoTrans = getTranslationMatrix((float)rc->origin.x, (float)rc->origin.y, 0.0f);
+        tinyVec v_final = matrixVecMul(orthoTrans, v);
+        return vecToPoint2(v_final);
     }
-	 return (Point2) {.x = sx1,.y=sy1};
 }
+
 
 void _renderLine3D(renderContext* rc, Point3 p1, Point3 p2, Color color) {
 
@@ -394,11 +384,11 @@ int _drawPixel(renderContext *rc, int x, int y,Color color) {
 }
 
 void _renderPoint3D(renderContext *rc, Point3 p,Color color) {
-	int screenX,screenY;
 	Point2 projected = _project3D(rc,p);
-	_drawPixel(rc, projected.x + rc->origin.x, projected.y + rc->origin.y, color);
+	_drawPixel(rc, projected.x, projected.y, color);
 	return;
 }
+
 
 void _renderTriangle3D(renderContext* rc, Point3 *points[3],Color color){
 	 Point2* points_2[3];

@@ -52,6 +52,7 @@ int sort_point2(Point2 **points, size_t points_len) {
 
 Vector4 point_to_vector(Point3 p, int w) {
 	return (Vector4) {
-		.inner = {p.x,p.y,p.z,w}
+		.inner = { (float)p.x, (float)p.y, (float)p.z, (float)w }
 	};
 } 
+

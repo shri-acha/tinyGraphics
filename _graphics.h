@@ -14,6 +14,8 @@ renderedObject* newLineObject(Point2 start,Point2 end);
 
 Point2 _rotatePoint2D(renderContext* rc,int x, int y, float theta, axis ax);
 Point3 _rotatePoint3D(renderContext* rc,int x, int y, int z, float theta, axis ax);
+Point2 _project3D(renderContext* rc, Point3 p);
+
 
 void _renderTriangle2D(renderContext* rc, Point2 *points[3],Color color);
 void _renderLine2D(renderContext *rc,Point2 p1, Point2 p2,Color color);
