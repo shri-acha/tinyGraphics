@@ -27,17 +27,7 @@ int main() {
     glfwSwapInterval(1);
 
     GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
-
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glColor3f(1.0f, 1.0f, 1.0f);
-
-    glEnable(GL_TEXTURE_2D);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, fb->width, fb->height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
+    TINY_GL_INIT_TEXTURE(fb, textureID);
 
     while (!glfwWindowShouldClose(window)) {
 
@@ -55,23 +45,7 @@ int main() {
 
 		 renderAngledTriangle3D(&rc, points, theta, Z, grid_color);
 
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, fb->width, fb->height, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, fb->buffer);
-
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        glBegin(GL_QUADS);
-            glTexCoord2f(0.0f, 1.0f); glVertex2f(-1.0f, -1.0f); // bl 
-            glTexCoord2f(1.0f, 1.0f); glVertex2f( 1.0f, -1.0f); // br 
-            glTexCoord2f(1.0f, 0.0f); glVertex2f( 1.0f,  1.0f); // tr 
-            glTexCoord2f(0.0f, 0.0f); glVertex2f(-1.0f,  1.0f); // tl
-        glEnd();
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-
-        flushPixelBuffer(fb->buffer, fb->width, fb->height);
-        flushSceneContext(rc.scene_context);    
+        TINY_GL_PRESENT(window, fb, &rc, textureID);
     }
 
     destroyFrameBuffer(fb);

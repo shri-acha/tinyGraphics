@@ -86,3 +86,6 @@ Point2 rotatePoint2D(renderContext* rc,int x, int y, float theta, axis ax);
 
 /* Allocates and initializes a new sceneContext with a list of renderedObjects */
 sceneContext* newSceneContext();
+
+#include "gl_ext.h"
+
