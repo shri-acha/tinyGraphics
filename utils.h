@@ -19,3 +19,5 @@ int get_index(frameBuffer *fb, int x, int y);
 int sort_point2(Point2** points,size_t points_len);
 
 Vector4 point_to_vector(Point3 p, int w);
+
+DirectionVector lookAt(Point3 camera_pos, Point3 target, Vector4 world_up);

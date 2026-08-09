@@ -17,6 +17,13 @@ struct Point3 {
   int z;
 };
 
+/// Vector type for direction
+typedef struct{
+	tinyVec up;
+	tinyVec right;
+	tinyVec forward;
+}DirectionVector;
+
 /// Type of event handled.
 typedef enum {
 	MOUSE,
@@ -58,6 +65,11 @@ typedef struct {
 	};
 }Event;
 
+/// Event handler wrapper
+typedef struct {
+	void (*f) (Event e);
+}EventHandler;
+
 /// Vector4 is an internal struct representation used for storing 3D
 /// point with scale value 'w'.
 typedef tinyVec Vector4;
@@ -67,6 +79,7 @@ typedef tinyVec Vector4;
 /// satisfies the 
 typedef tinyMatrix Matrix3;
 
+/// Index just the same type as a Point3
 typedef struct {
 	int x;
 	int y;
@@ -156,5 +169,7 @@ typedef struct {
   float focal_length;
   Index origin;
   sceneContext* scene_context;
+  DirectionVector camera_direction;
   Point3 camera_position;
+  EventHandler event_handler;
 } renderContext;

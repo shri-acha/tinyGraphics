@@ -11,6 +11,17 @@ int main() {
         .origin = (Index){.x = 600, .y = 600, .z= 800}, 
         .scene_context = newSceneContext(),
         .camera_position= (Point3) {.x=0,.y=0,.z=200},
+			.camera_direction = (DirectionVector) {
+				 .up = (Vector4) {
+					  .inner = { -0.40824829f, 0.81649658f, -0.40824829f, 0.0f }
+				 },
+				 .right = (Vector4) {
+					  .inner = { 0.70710678f, 0.0f, -0.70710678f, 0.0f }
+				 },
+				 .forward = (Vector4) {
+					  .inner = { -0.57735027f, -0.57735027f, -0.57735027f, 0.0f }
+				 }
+			},
         .projection = PERSPECTIVE, 
         .focal_length = 150.0f, 
     };
@@ -52,6 +63,7 @@ int main() {
 
         renderLine3D(&rc, (Point3){.x=-400,.y=0,.z=0}, (Point3){.x=400,.y=0,.z=0}, grid_color);
         renderLine3D(&rc, (Point3){.x=0,.y=-400,.z=0}, (Point3){.x=0,.y=400,.z=0}, grid_color);
+        renderLine3D(&rc, (Point3){.x=0,.y=0,.z=-400}, (Point3){.x=0,.y=0,.z=400}, grid_color);
 
         Point3** faces[6] = { t1, t2, t3, t4, t5, t6 };
         

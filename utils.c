@@ -56,3 +56,26 @@ Vector4 point_to_vector(Point3 p, int w) {
 	};
 } 
 
+DirectionVector lookAt(Point3 camera_pos, Point3 target, Vector4 world_up) {
+    float fx = (float)target.x - (float)camera_pos.x;
+    float fy = (float)target.y - (float)camera_pos.y;
+    float fz = (float)target.z - (float)camera_pos.z;
+    float f_len = sqrtf(fx*fx + fy*fy + fz*fz);
+    if (f_len > 0.0001f) { fx /= f_len; fy /= f_len; fz /= f_len; }
+
+    float rx = fy * world_up.inner[2] - fz * world_up.inner[1];
+    float ry = fz * world_up.inner[0] - fx * world_up.inner[2];
+    float rz = fx * world_up.inner[1] - fy * world_up.inner[0];
+    float r_len = sqrtf(rx*rx + ry*ry + rz*rz);
+    if (r_len > 0.0001f) { rx /= r_len; ry /= r_len; rz /= r_len; }
+
+    float ux = ry * fz - rz * fy;
+    float uy = rz * fx - rx * fz;
+    float uz = rx * fy - ry * fx;
+
+    return (DirectionVector){
+        .right   = (tinyVec){ .inner = { rx, ry, rz, 0.0f } },
+        .up      = (tinyVec){ .inner = { ux, uy, uz, 0.0f } },
+        .forward = (tinyVec){ .inner = { fx, fy, fz, 0.0f } }
+    };
+}

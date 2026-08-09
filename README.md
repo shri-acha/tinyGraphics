@@ -9,3 +9,6 @@ A tiny, dependency-light software rendering library written in C.
 
 ### Rotating Triangle
 <img width="400" height="225" alt="2026-07-18 05-33-54" src="https://github.com/user-attachments/assets/5ff6ea67-d1d1-4604-a21c-22bf792383ef" />
+
+### Detachable camera
+<img width="1280" height="720" alt="2026-08-09 18-37-38" src="https://github.com/user-attachments/assets/8ef4a85d-1971-48e5-be71-2b4c47122944" />

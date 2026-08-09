@@ -1,3 +1,4 @@
+#include "tiny_math.h"
 #include "types.h"
 #include <stdlib.h>
 #include "_graphics.h"
@@ -414,72 +415,71 @@ void _renderAngledTriangle2D(renderContext* rc, Point2* points[3],float theta, a
 }
 
 Point2 _project3D(renderContext* rc, Point3 p) {
-    tinyVec v = point3ToVec(p);
+    float px = (float)p.x - (float)rc->camera_position.x;
+    float py = (float)p.y - (float)rc->camera_position.y;
+    float pz = (float)p.z - (float)rc->camera_position.z;
+
+    float* r = rc->camera_direction.right.inner;
+    float* u = rc->camera_direction.up.inner;
+    float* f = rc->camera_direction.forward.inner;
+
+    float x_cam = r[0] * px + r[1] * py + r[2] * pz;
+    float y_cam = u[0] * px + u[1] * py + u[2] * pz;
+    float z_cam = f[0] * px + f[1] * py + f[2] * pz;
+
     if (rc->projection == PERSPECTIVE) {
-        tinyMatrix perspectiveM = (tinyMatrix){
-            .inner = {
-                { rc->focal_length, 0.0f, 0.0f, 0.0f },
-                { 0.0f, rc->focal_length, 0.0f, 0.0f },
-                { 0.0f, 0.0f, 1.0f, 0.0f },
-                { 0.0f, 0.0f, 1.0f, (float)rc->camera_position.z }
-            }
-        };
-        tinyVec v_proj = matrixVecMul(perspectiveM, v);
-        float w = v_proj.inner[3];
-        if (w != 0.0f) {
-            v_proj.inner[0] /= w;
-            v_proj.inner[1] /= w;
-            v_proj.inner[2] /= w;
-            v_proj.inner[3] = 1.0f;
+        if (z_cam <= 0.1f) {
+            return (Point2){ .x = -9999, .y = -9999 };
         }
-        tinyMatrix screenTrans = getTranslationMatrix((float)rc->origin.x - (float)rc->camera_position.x, (float)rc->origin.y - (float)rc->camera_position.y, 0.0f);
-        tinyVec v_final = matrixVecMul(screenTrans, v_proj);
-        return vecToPoint2(v_final);
+
+        float x_proj = (x_cam * rc->focal_length) / z_cam;
+        float y_proj = (y_cam * rc->focal_length) / z_cam;
+
+        return (Point2){
+            .x = (int)roundf(x_proj + (float)rc->origin.x),
+            .y = (int)roundf((float)rc->origin.y - y_proj)
+        };
     } else {
-        tinyMatrix orthoTrans = getTranslationMatrix((float)rc->origin.x, (float)rc->origin.y, 0.0f);
-        tinyVec v_final = matrixVecMul(orthoTrans, v);
-        return vecToPoint2(v_final);
+        return (Point2){
+            .x = (int)roundf(x_cam + (float)rc->origin.x),
+            .y = (int)roundf((float)rc->origin.y - y_cam)
+        };
     }
 }
 
 
 void _renderLine3D(renderContext* rc, Point3 p1, Point3 p2, Color color) {
+    int dx = abs(p2.x - p1.x);
+    int dy = abs(p2.y - p1.y);
+    int dz = abs(p2.z - p1.z);
 
-	 int sx1 = p1.x,sx2=p2.x,sy1=p1.y,sy2=p2.y;
+    int steps = dx;
+    if (dy > steps) steps = dy;
+    if (dz > steps) steps = dz;
 
-    int dx = abs(sx2 - sx1);
-    int dy = -abs(sy2 - sy1);
+    if (steps == 0) {
+        _renderPoint3D(rc, p1, color);
+        return;
+    }
 
-    int sx = sx1 < sx2 ? 1 : -1;
-    int sy = sy1 < sy2 ? 1 : -1;
-    int err = dx + dy;
+    float x_inc = (float)(p2.x - p1.x) / (float)steps;
+    float y_inc = (float)(p2.y - p1.y) / (float)steps;
+    float z_inc = (float)(p2.z - p1.z) / (float)steps;
 
-    int total_steps = (dx > -dy) ? dx : -dy;
-    float current_z = p1.z;
-    float z_step = (total_steps == 0) ? 0 : (p2.z - p1.z) / (float)total_steps;
+    float x = (float)p1.x;
+    float y = (float)p1.y;
+    float z = (float)p1.z;
 
-    while (1) {
-			 Point3 screen_point = {
-				 .x = sx1 ,
-				 .y = sy1 ,
-				 .z = current_z,
-			 };
-			 _renderPoint3D(rc, screen_point, color);
-
-        if (sx1 == sx2 && sy1 == sy2)
-            break;
-            
-        int e2 = 2 * err;
-        if (e2 >= dy) {
-            err += dy;
-            sx1 += sx;
-        }
-        if (e2 <= dx) {
-            err += dx;
-            sy1 += sy;
-        }
-        
-        current_z += z_step;
+    for (int i = 0; i <= steps; i++) {
+        Point3 p = {
+            .x = (int)roundf(x),
+            .y = (int)roundf(y),
+            .z = (int)roundf(z)
+        };
+        _renderPoint3D(rc, p, color);
+        x += x_inc;
+        y += y_inc;
+        z += z_inc;
     }
 }
 
