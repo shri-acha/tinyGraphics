@@ -40,6 +40,13 @@ void renderCircle3D(renderContext *rc, Point3 p, int r, Color color);
  */
 void renderAngledCircle2D(renderContext *rc, Point2 p, int r, float theta,
                        axis ax,Color color);
+
+/*
+ * Renders a circle of radius r with center at (x,y,z) rotated about the axis
+ * through its center at theta degrees.
+ */
+void renderAngledCircle3D(renderContext *rc, Point3 p, int r, float theta, axis ax,Color color);
+
 /*Renders a triangle*/
 void renderTriangle2D(renderContext *rc, Point2* points[3],Color color);
 

@@ -29,3 +29,4 @@ void _renderPoint3D(renderContext *rc, Point3 p,Color color);
 void _renderLine3D(renderContext *rc,Point3 p1, Point3 p2,Color color);
 void _renderTriangle3D(renderContext *rc, Point3* points[3],Color color);
 void _renderCircle3D(renderContext *rc, Point3 c,int r,Color color);
+void _renderAngledCircle3D(renderContext *rc, Point3 c,int r,float theta, axis ax,Color color);

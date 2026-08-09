@@ -17,6 +17,47 @@ struct Point3 {
   int z;
 };
 
+/// Type of event handled.
+typedef enum {
+	MOUSE,
+	KEYBOARD,
+}EventType;
+
+/// Defines the state of the event.
+/// currently, it only supports keyboard and mouse,(tap and release) event, TODO: scroll and control signals?
+typedef enum {
+	DOWN,
+	UP,
+}KeyState;
+
+/// Defines the what side of the mouse it is being clicked
+typedef enum {
+	LEFT,
+	RIGHT,
+}MouseButton;
+
+/// Defines the Event that is handled by a Mouse 
+typedef struct {
+	KeyState state;
+	MouseButton btn;
+	Point2 pos;
+}MouseEvent;
+
+/// Defines the Event that is handled by a Keyboard 
+typedef struct {
+	int keycode;
+	KeyState state;
+}KeyboardEvent;
+
+/// Generic event type
+typedef struct {
+	EventType ev_typ;
+	union {
+		MouseEvent me;
+		KeyboardEvent ke;
+	};
+}Event;
+
 /// Vector4 is an internal struct representation used for storing 3D
 /// point with scale value 'w'.
 typedef tinyVec Vector4;
