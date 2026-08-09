@@ -1,6 +1,6 @@
 CFLAGS = -I vendor/fast_obj/
 LIBS = -lm -lglfw -lGL
-BUILD_DIR = build
+BUILD_DIR = build/
 
 opengl_prism: opengl_prism.c ../3D/*.c ../2D/*.c ../*.c
 	@mkdir -p $(BUILD_DIR)

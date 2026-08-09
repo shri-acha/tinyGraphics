@@ -3,6 +3,7 @@
 #include "utils.h"
 #include "vendor/fast_obj/fast_obj.h"
 #include "./gl_ext.h"
+#include "tiny_math.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <math.h>

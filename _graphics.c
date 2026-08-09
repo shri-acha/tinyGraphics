@@ -491,13 +491,13 @@ int _drawPixel(renderContext *rc, int x, int y, int z, Color color) {
   int width = rc->frame_buffer->width;
   int height = rc->frame_buffer->height;
 
-  if (x >= width || y >= height || x < 0 || y < 0) {
+  if (x > width || y > height || x < 0 || y < 0) {
     return -1;
   }
-
   int idx = get_index(rc->frame_buffer, x, y);
+
   if (rc->frame_buffer->depth_buffer == NULL || rc->frame_buffer->depth_buffer[idx] > z) {
-      rc->frame_buffer->buffer[idx].color = color;
+	  rc->frame_buffer->buffer[idx].color = color;
       if (rc->frame_buffer->depth_buffer) {
           rc->frame_buffer->depth_buffer[idx] = z;
       }
@@ -505,7 +505,7 @@ int _drawPixel(renderContext *rc, int x, int y, int z, Color color) {
   return 0;
 }
 
-static void _drawHorizontalLineScreen(renderContext *rc, int x1, int x2,float z1,float z2, int y, Color color)  {
+void _drawHorizontalLineScreen(renderContext *rc, int x1, int x2,float z1,float z2, int y, Color color)  {
 	if (x1 > x2) {
 		int tmpx = x1; x1 = x2; x2 = tmpx;
     float tmpz = z1; z1 = z2; z2 = tmpz;
@@ -569,10 +569,10 @@ void _renderTriangle3D(renderContext* rc, Point3 *points[3],Color color){
 			  float z_right = (float)z1;
 
 			  if ( y2 != y1) {
-			  float change_x_left = (y2 - y1 != 0)?((float)(x2 - x1) / (float)(y2 - y1)):((float)(x4 - x1) / (float)(y1 - y2));
-			  float change_x_right = (y2 - y1 != 0)?((float)(x4 - x1) / (float)(y2 - y1)):((float)(x4 - x1) / (float)(y1 - y2));
-			  float change_z_left = (y2 - y1 != 0)?((float)(z2 - z1) / (float)(y2 - y1)):((float)(z4 - z1) / (float)(y1 - y2));
-			  float change_z_right = (y2 - y1 != 0)?((float)(z4 - z1) / (float)(y2 - y1)):((float)(z4 - z1) / (float)(y1 - y2));
+			  float change_x_left = (y2 - y1 > 0)?((float)(x2 - x1) / (float)(y2 - y1)):((float)(x4 - x1) / (float)(y1 - y2));
+			  float change_x_right = (y2 - y1 > 0)?((float)(x4 - x1) / (float)(y2 - y1)):((float)(x4 - x1) / (float)(y1 - y2));
+			  float change_z_left = (y2 - y1 > 0)?((float)(z2 - z1) / (float)(y2 - y1)):((float)(z4 - z1) / (float)(y1 - y2));
+			  float change_z_right = (y2 - y1 > 0)?((float)(z4 - z1) / (float)(y2 - y1)):((float)(z4 - z1) / (float)(y1 - y2));
 
 					for (int y_scan = y1; y_scan < y2; y_scan++) {
 						  if (x_left >= x_right) {

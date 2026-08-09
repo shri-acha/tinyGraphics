@@ -1,5 +1,4 @@
 #include "../graphics.h"
-#include "../tiny_math.h"
 #include <GLFW/glfw3.h>
 #include <math.h>
 

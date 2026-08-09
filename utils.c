@@ -32,8 +32,6 @@ int compare_value(Operator op, int p1, int p2) {
 }
 
 int get_index(frameBuffer *fb, int x, int y) {
-  if (x < 0 || x >= fb->width || y < 0 || y >= fb->height)
-    return -1;
   return y * fb->width + x;
 }
 
