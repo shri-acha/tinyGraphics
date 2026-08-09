@@ -79,3 +79,17 @@ DirectionVector lookAt(Point3 camera_pos, Point3 target, Vector4 world_up) {
         .forward = (tinyVec){ .inner = { fx, fy, fz, 0.0f } }
     };
 }
+
+
+float clamp01(float v) {
+    if (v < 0.0f) return 0.0f;
+    if (v > 1.0f) return 1.0f;
+    return v;
+}
+
+Color kd_to_color(const float kd[3]) {
+    uint16_t r5 = (uint16_t)(clamp01(kd[0]) * 31.0f);
+    uint16_t g6 = (uint16_t)(clamp01(kd[1]) * 63.0f);
+    uint16_t b5 = (uint16_t)(clamp01(kd[2]) * 31.0f);
+    return (Color){ .literal = (uint16_t)((r5 << 11) | (g6 << 5) | b5) };
+}

@@ -2,7 +2,7 @@
 #include "types.h"
 #include "stdlib.h"
 /*Draws a pixel at the location x,y with z  */
-int _drawPixel(renderContext *rc, int x, int y,Color color);
+int _drawPixel(renderContext *rc, int x, int y,int z,Color color);
 
 /* Loads a rendered object into the context */
 int loadRenderedObjectToContext(renderContext* rc, renderedObject* ro);
@@ -14,7 +14,7 @@ renderedObject* newLineObject(Point2 start,Point2 end);
 
 Point2 _rotatePoint2D(renderContext* rc,int x, int y, float theta, axis ax);
 Point3 _rotatePoint3D(renderContext* rc,int x, int y, int z, float theta, axis ax);
-Point2 _project3D(renderContext* rc, Point3 p);
+Point2 _project3D(renderContext* rc, Point3 p,int* depth);
 
 
 void _renderTriangle2D(renderContext* rc, Point2 *points[3],Color color);

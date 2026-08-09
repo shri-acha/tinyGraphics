@@ -53,6 +53,9 @@
     glfwSwapBuffers((window)); \
     glfwPollEvents(); \
     flushPixelBuffer((fb)->buffer, (fb)->width, (fb)->height); \
+    if ((fb)->depth_buffer) { \
+        flushDepthBuffer((fb)->depth_buffer, (fb)->width, (fb)->height); \
+    } \
     if ((rc_ptr) && (rc_ptr)->scene_context) { \
         flushSceneContext((rc_ptr)->scene_context); \
     } \

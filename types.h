@@ -102,6 +102,7 @@ typedef struct {
   int width;
   int height;
   pixelBuffer *buffer;
+  int *depth_buffer;
 } frameBuffer;
 
 typedef enum {

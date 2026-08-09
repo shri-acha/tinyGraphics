@@ -57,3 +57,4 @@ dkms.conf
 \#*\#
 
 examples/build/*
+examples/models/*

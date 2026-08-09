@@ -414,7 +414,7 @@ void _renderAngledTriangle2D(renderContext* rc, Point2* points[3],float theta, a
 
 }
 
-Point2 _project3D(renderContext* rc, Point3 p) {
+Point2 _project3D(renderContext* rc, Point3 p,int* depth) {
     float px = (float)p.x - (float)rc->camera_position.x;
     float py = (float)p.y - (float)rc->camera_position.y;
     float pz = (float)p.z - (float)rc->camera_position.z;
@@ -426,6 +426,10 @@ Point2 _project3D(renderContext* rc, Point3 p) {
     float x_cam = r[0] * px + r[1] * py + r[2] * pz;
     float y_cam = u[0] * px + u[1] * py + u[2] * pz;
     float z_cam = f[0] * px + f[1] * py + f[2] * pz;
+
+    if (depth != NULL) {
+        *depth = (int)roundf(z_cam);
+    }
 
     if (rc->projection == PERSPECTIVE) {
         if (z_cam <= 0.1f) {
@@ -483,7 +487,7 @@ void _renderLine3D(renderContext* rc, Point3 p1, Point3 p2, Color color) {
     }
 }
 
-int _drawPixel(renderContext *rc, int x, int y,Color color) {
+int _drawPixel(renderContext *rc, int x, int y, int z, Color color) {
   int width = rc->frame_buffer->width;
   int height = rc->frame_buffer->height;
 
@@ -491,25 +495,34 @@ int _drawPixel(renderContext *rc, int x, int y,Color color) {
     return -1;
   }
 
-  rc->frame_buffer->buffer[get_index(rc->frame_buffer, x, y)].color = color;
+  int idx = get_index(rc->frame_buffer, x, y);
+  if (rc->frame_buffer->depth_buffer == NULL || rc->frame_buffer->depth_buffer[idx] > z) {
+      rc->frame_buffer->buffer[idx].color = color;
+      if (rc->frame_buffer->depth_buffer) {
+          rc->frame_buffer->depth_buffer[idx] = z;
+      }
+  }
   return 0;
 }
 
-static void _drawHorizontalLineScreen(renderContext *rc, int x1, int x2, int y, Color color) {
-  if (x1 > x2) {
-    int tmp = x1;
-    x1 = x2;
-    x2 = tmp;
+static void _drawHorizontalLineScreen(renderContext *rc, int x1, int x2,float z1,float z2, int y, Color color)  {
+	if (x1 > x2) {
+		int tmpx = x1; x1 = x2; x2 = tmpx;
+    float tmpz = z1; z1 = z2; z2 = tmpz;
   }
-
+  int steps = x2 - x1;
+  float z_inc = (steps != 0) ? (z2 - z1) / (float)steps : 0.0f;
+  float z = z1;
   for (int i = x1; i <= x2; i++) {
-    _drawPixel(rc, i, y, color);
+    _drawPixel(rc, i, y, (int)roundf(z), color);
+    z += z_inc;
   }
 }
 
 void _renderPoint3D(renderContext *rc, Point3 p,Color color) {
-	Point2 projected = _project3D(rc,p);
-	_drawPixel(rc, projected.x, projected.y, color);
+	int depth;
+	Point2 projected = _project3D(rc,p,&depth);
+	_drawPixel(rc, projected.x, projected.y, depth, color);
 	return;
 }
 
@@ -527,68 +540,82 @@ void _renderTriangle3D(renderContext* rc, Point3 *points[3],Color color){
         _renderLine3D(rc, p3, p1,color);
         break;
     }
-    case FILLED: {
-			for (int i=0;i<3;i++) {
-				 tmp_buff[i] = _project3D(rc, *points[i]);
-				 points_2[i] = &tmp_buff[i];
-			}
+	case FILLED: {
+		 int depth_buff[3];
+		 for (int i=0;i<3;i++) {
+				tmp_buff[i] = _project3D(rc, *points[i], &depth_buff[i]);
+				points_2[i] = &tmp_buff[i];
+		 }
 
-        sort_point2(points_2, 3); 
+		 sort_point2(points_2, 3);
 
-        int x1 = points_2[0]->x, y1 = points_2[0]->y;
-        int x2 = points_2[1]->x, y2 = points_2[1]->y;
-        int x3 = points_2[2]->x, y3 = points_2[2]->y;
+		 int idx0 = (int)(points_2[0] - tmp_buff);
+		 int idx1 = (int)(points_2[1] - tmp_buff);
+		 int idx2 = (int)(points_2[2] - tmp_buff);
 
-		// Since on sorting, points[0] & points[2] are the furthest away from each other, hence, point[1] is the seperating line for rendering the triangle's
-		// top and bottom half.
-		  int y4 = y2; // USING FOR MY SANITY'S SAKE
-        int x4 = (y3-y1 != 0)?( x1 + (int)((float)(y4 - y1) * ((float)(x3 - x1) / (float)(y3 - y1))) ):0;
+		 int x1 = points_2[0]->x, y1 = points_2[0]->y, z1 = depth_buff[idx0];
+		 int x2 = points_2[1]->x, y2 = points_2[1]->y, z2 = depth_buff[idx1];
+		 int x3 = points_2[2]->x, y3 = points_2[2]->y, z3 = depth_buff[idx2];
 
-		  // USES THE DDA TO RENDER EACH LINE 
-				{
-			  // TOP HALF
-            float x_left = (float)x1;
-            float x_right = (float)x1;
+		 int y4 = y2;
+		 int x4 = (y3-y1 != 0)?( x1 + (int)((float)(y4 - y1) * ((float)(x3 - x1) / (float)(y3 - y1))) ):0;
+		 int z4 = (y3-y1 != 0)?( z1 + (int)((float)(y4 - y1) * ((float)(z3 - z1) / (float)(y3 - y1))) ):z1;
 
-				if ( y2 != y1) {
-				float change_x_left = (y2 - y1 != 0)?((float)(x2 - x1) / (float)(y2 - y1)):((float)(x4 - x1) / (float)(y1 - y2));
-				float change_x_right = (y2 - y1 != 0)?((float)(x4 - x1) / (float)(y2 - y1)):((float)(x4 - x1) / (float)(y1 - y2));
+		 {
+			// TOP HALF
+			  float x_left = (float)x1;
+			  float x_right = (float)x1;
+			  float z_left = (float)z1;
+			  float z_right = (float)z1;
+
+			  if ( y2 != y1) {
+			  float change_x_left = (y2 - y1 != 0)?((float)(x2 - x1) / (float)(y2 - y1)):((float)(x4 - x1) / (float)(y1 - y2));
+			  float change_x_right = (y2 - y1 != 0)?((float)(x4 - x1) / (float)(y2 - y1)):((float)(x4 - x1) / (float)(y1 - y2));
+			  float change_z_left = (y2 - y1 != 0)?((float)(z2 - z1) / (float)(y2 - y1)):((float)(z4 - z1) / (float)(y1 - y2));
+			  float change_z_right = (y2 - y1 != 0)?((float)(z4 - z1) / (float)(y2 - y1)):((float)(z4 - z1) / (float)(y1 - y2));
 
 					for (int y_scan = y1; y_scan < y2; y_scan++) {
+						  if (x_left >= x_right) {
+								 _drawHorizontalLineScreen(rc, (int)x_right, (int)x_left, z_right, z_left, y_scan,color);
+						  } else {
+								 _drawHorizontalLineScreen(rc, (int)x_left, (int)x_right, z_left, z_right, y_scan,color);
+						  }
+						  x_left += change_x_left;
+						  x_right += change_x_right;
+						  z_left += change_z_left;
+						  z_right += change_z_right;
+					}
+			  }
+		 }
+
+		 {
+			// BOTTOM HALF
+			  float x_left = (float)x2;
+			  float x_right = (float)x4;
+			  float z_left = (float)z2;
+			  float z_right = (float)z4;
+
+			  if ( y3 != y2) {
+					float change_x_left = (y3-y2 > 0)?((float)(x3 - x2) / (float)(y3 - y2)):((float)(x3 - x2) / (float)(y2 - y3));
+					float change_x_right = (y3-y2 > 0)?((float)(x3 - x4) / (float)(y3 - y2)):((float)(x3 - x2) / (float)(y2 - y3));
+					float change_z_left = (y3-y2 > 0)?((float)(z3 - z2) / (float)(y3 - y2)):((float)(z3 - z2) / (float)(y2 - y3));
+					float change_z_right = (y3-y2 > 0)?((float)(z3 - z4) / (float)(y3 - y2)):((float)(z3 - z2) / (float)(y2 - y3));
+
+					for (int y_scan = y2; y_scan < y3; y_scan++) {
 						 if (x_left >= x_right) {
-							  _drawHorizontalLineScreen(rc, (int)x_right, (int)x_left, y_scan,color);
+							  _drawHorizontalLineScreen(rc, (int)x_right, (int)x_left, z_right, z_left, y_scan,color);
 						 } else {
-							  _drawHorizontalLineScreen(rc, (int)x_left, (int)x_right, y_scan,color);
+							  _drawHorizontalLineScreen(rc, (int)x_left, (int)x_right, z_left, z_right, y_scan,color);
 						 }
 						 x_left += change_x_left;
 						 x_right += change_x_right;
+						 z_left += change_z_left;
+						 z_right += change_z_right;
 					}
-				}
-        }
-
-        {
-
-			  // BOTTOM HALF
-            float x_left = (float)x2;
-				float x_right = (float)x4;
-				if ( y3 != y2) {
-					float change_x_left = (y3-y2 > 0)?((float)(x3 - x2) / (float)(y3 - y2)):((float)(x3 - x2) / (float)(y2 - y3));
-					float change_x_right = (y3-y2 > 0)?((float)(x3 - x4) / (float)(y3 - y2)):((float)(x3 - x2) / (float)(y2 - y3));
-
-					for (int y_scan = y2; y_scan < y3; y_scan++) {
-						if (x_left >= x_right) {
-							_drawHorizontalLineScreen(rc, (int)x_right, (int)x_left, y_scan,color);
-						} else {
-							_drawHorizontalLineScreen(rc, (int)x_left, (int)x_right, y_scan,color);
-						}
-						x_left += change_x_left;
-						x_right += change_x_right;
-					}
-				}
-
-        }
-        break;
-    }
+			  }
+		 }
+		 break;
+	}
     }
 }
 

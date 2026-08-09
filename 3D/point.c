@@ -1,9 +1,8 @@
-#include "../graphics.h"
 #include "../_graphics.h"
 
-int renderPoint3D(renderContext *rc, Point3 p, Color color) {
-	Point2 projected = _project3D(rc, p);
-	return _drawPixel(rc, projected.x, projected.y, color);
+int renderPoint3D(renderContext *rc, Point3 p, int* depth, Color color) {
+	Point2 projected = _project3D(rc, p, depth);
+	return _drawPixel(rc, projected.x, projected.y, p.z, color);
 }
 
 

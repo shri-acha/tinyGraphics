@@ -1,10 +1,11 @@
 #pragma once
 #include "types.h"
 #include "utils.h"
+#include "vendor/fast_obj/fast_obj.h"
+#include "./gl_ext.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <math.h>
-#include <string.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -70,6 +71,9 @@ pixelBuffer get_pixel(frameBuffer *fb, int x, int y);
 /*Flushes the pixel buffer of width * height */
 int flushPixelBuffer(pixelBuffer *pb, int width, int height);
 
+/*Flushes the depth buffer of width * height */
+int flushDepthBuffer(int *depth_buffer, int width, int height);
+
 /*Flushes the sceneContext*/
 int flushSceneContext(sceneContext* sc);
 
@@ -94,5 +98,4 @@ Point2 rotatePoint2D(renderContext* rc,int x, int y, float theta, axis ax);
 /* Allocates and initializes a new sceneContext with a list of renderedObjects */
 sceneContext* newSceneContext();
 
-#include "gl_ext.h"
-
+void renderMesh3D(renderContext *rc, fastObjMesh *mesh, Point3 offset, Color color, float scale);
