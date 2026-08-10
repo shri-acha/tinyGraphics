@@ -1,4 +1,4 @@
-#include "_graphics.h"
+#include "src/_graphics.h"
 #include "graphics.h"
 #include "types.h"
 #define MAX_OBJECTS_IN_A_SCENE 128

@@ -7,13 +7,33 @@ typedef enum {
 	Z,
 } axis;
 
-typedef struct Point2 Point2;
-typedef struct Point3 Point3;
+
+/// Point2 represents the world coordinates points, i.e. coordinates w.r.t. to the origin defined by the 
+/// RenderingContext
+typedef struct {
+  int x;
+  int y;
+}Point2;
+
+/// Point3 represents the world coordinates points, i.e. coordinates w.r.t. to the origin defined by the 
+/// RenderingContext
+typedef struct {
+  int x;
+  int y;
+  int z;
+}Point3;
 
 /* Internal Vector implementation (4-element vector in homogeneous coordinates) */
 typedef struct {
 	float inner[4];
 } tinyVec;
+
+/// Vector type for direction
+typedef struct{
+	tinyVec up;
+	tinyVec right;
+	tinyVec forward;
+}DirectionVector;
 
 /* Internal Matrix implementation (4x4 transformation matrix) */
 typedef struct {
@@ -47,4 +67,3 @@ float vecDot3(tinyVec a, tinyVec b);
 tinyVec vecCross(tinyVec a, tinyVec b);
 tinyVec vecSub(tinyVec a, tinyVec b);
 tinyVec vecNormalize(tinyVec v);
-

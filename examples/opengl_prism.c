@@ -7,7 +7,7 @@ int main() {
     frameBuffer* fb = createFrameBuffer(1600, 1600);
     renderContext rc = {
         .frame_buffer = fb, 
-        .render_mode = WIREFRAME,
+        .render_mode = FILLED,
         .origin = (Index){.x = 600, .y = 600, .z= 800}, 
         .scene_context = newSceneContext(),
         .camera_position= (Point3) {.x=0,.y=0,.z=200},
@@ -24,8 +24,13 @@ int main() {
 			},
         .projection = PERSPECTIVE, 
         .focal_length = 150.0f, 
+        .shading_mode = SHADE_GOURAUD,
+        .light = {
+            .direction = (tinyVec){ .inner = { 0.0f, -1.0f, 0.0f, 0.0f } },
+            .ambient = 0.2f,
+            .diffuse = 0.8f
+        },
     };
-    float theta = 0.0;
 
     if (!glfwInit()) return -1;
     
@@ -54,6 +59,12 @@ int main() {
     Point3* t5[3] = { &front_left, &back_left, &front_right }; // Base Split 1
     Point3* t6[3] = { &back_right, &front_right, &back_left }; // Base Split 2
 
+    float theta = 0.0f;
+    float orbit_radius = 350.0f;
+    float cam_height = 150.0f;
+    Point3 target = { .x = 0, .y = 0, .z = 0 };
+    Vector4 world_up = (Vector4){ .inner = { 0.0f, 1.0f, 0.0f, 0.0f } };
+
     while (!glfwWindowShouldClose(window)) {
 
         Color grid_color;
@@ -61,6 +72,11 @@ int main() {
         uint16_t grid_b = (uint16_t)(20 + 11) & 0x1F;
         grid_color.literal = (grid_r << 11) | (0 << 5) | grid_b;
 
+        rc.camera_position.x = (int)roundf(orbit_radius * sinf(theta));
+        rc.camera_position.y = (int)roundf(cam_height);
+        rc.camera_position.z = (int)roundf(orbit_radius * cosf(theta));
+
+        rc.camera_direction = lookAt(rc.camera_position, target, world_up);
         renderLine3D(&rc, (Point3){.x=-400,.y=0,.z=0}, (Point3){.x=400,.y=0,.z=0}, grid_color);
         renderLine3D(&rc, (Point3){.x=0,.y=-400,.z=0}, (Point3){.x=0,.y=400,.z=0}, grid_color);
         renderLine3D(&rc, (Point3){.x=0,.y=0,.z=-400}, (Point3){.x=0,.y=0,.z=400}, grid_color);

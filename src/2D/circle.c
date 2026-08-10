@@ -1,6 +1,4 @@
 #include "../_graphics.h"
-#include "../graphics.h"
-#include "../types.h"
 
 void renderCircle2D(renderContext *rc, Point2 p, int r, Color color) {
   _renderCircle2D(rc,p,r,color);

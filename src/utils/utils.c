@@ -1,5 +1,4 @@
-#include "utils.h"
-#include "types.h"
+#include "../utils.h"
 #include <stdlib.h>
 
 /*Gets the value of the pixel for the pixelBuffer at (x,y) */

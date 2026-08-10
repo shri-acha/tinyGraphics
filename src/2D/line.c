@@ -1,6 +1,4 @@
-#include "../graphics.h"
 #include "../_graphics.h"
-#include "../types.h"
 
 void renderLine2D(renderContext *rc, Point2 p1, Point2 p2,Color color) {
   _renderLine2D(rc, p1,p2,color);

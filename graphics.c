@@ -1,6 +1,6 @@
 #include "graphics.h"
 #include "types.h"
-#include "utils.h"
+#include "src/utils.h"
 #include <limits.h>
 
 frameBuffer *createFrameBuffer(int width, int height) {

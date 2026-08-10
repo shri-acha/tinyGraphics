@@ -1,7 +1,4 @@
 #include "../_graphics.h"
-#include "../graphics.h"
-#include "../types.h"
-
 
 void renderTriangle2D(renderContext *rc, Point2 *points[3],Color color) {
 	loadRenderedObjectToContext(rc, newTriangleObject(points, 0, X));

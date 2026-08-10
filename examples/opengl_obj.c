@@ -5,8 +5,8 @@
 
 int main() {
     fastObjMesh* chicken_mesh = fast_obj_read("./models/Chicken_01.obj");
-    fastObjMesh* couch_mesh = fast_obj_read("./models/77.obj");
-    if (!chicken_mesh || !couch_mesh) {
+    // fastObjMesh* couch_mesh = fast_obj_read("./models/77.obj");
+    if (!chicken_mesh ) {
         fprintf(stderr, "failed to load\n");
         return -1;
     }
@@ -19,10 +19,10 @@ int main() {
         .scene_context = newSceneContext(),
         .camera_position = (Point3){ .x = 0, .y = 150, .z = 300 },
         .projection = PERSPECTIVE,
-        .focal_length = 200.0f,
+        .focal_length = 150.0f,
         .shading_mode = SHADE_GOURAUD,
         .light = {
-            .direction = (tinyVec){ .inner = { 1.0f, 1.0f, 1.0f, 0.0f } },
+            .direction = (tinyVec){ .inner = { 0.0f, 1.0f, 1.0f, 0.0f } },
             .ambient = 0.2f,
             .diffuse = 0.8f
         },
@@ -59,15 +59,15 @@ int main() {
         renderLine3D(&rc, (Point3){ .x = 0, .y = -400, .z = 0 }, (Point3){ .x = 0, .y = 400, .z = 0 }, grid_color);
         renderLine3D(&rc, (Point3){ .x = 0, .y = 0, .z = -400 }, (Point3){ .x = 0, .y = 0, .z = 400 }, grid_color);
 
-        renderMesh3D(&rc, chicken_mesh, chicken_mesh_offset, mesh_color, 0.75f);
-        renderMesh3D(&rc, couch_mesh, couch_mesh_offset, mesh_color, 1.5f);
+        renderMesh3D(&rc, chicken_mesh, chicken_mesh_offset, mesh_color, 2.0f);
+        //renderMesh3D(&rc, couch_mesh, couch_mesh_offset, mesh_color, 1.5f);
 
         TINY_GL_PRESENT(window, fb, &rc, textureID);
         theta += M_PI / 180.0f;
     }
 
     fast_obj_destroy(chicken_mesh);
-    fast_obj_destroy(couch_mesh);
+    // fast_obj_destroy(couch_mesh);
     destroyFrameBuffer(fb);
     destroyContext(NULL);
     glfwDestroyWindow(window);

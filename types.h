@@ -1,28 +1,6 @@
 #pragma once
 #include <stdint.h>
-#include "tiny_math.h"
-
-/// Point2 represents the world coordinates points, i.e. coordinates w.r.t. to the origin defined by the 
-/// RenderingContext
-struct Point2 {
-  int x;
-  int y;
-};
-
-/// Point3 represents the world coordinates points, i.e. coordinates w.r.t. to the origin defined by the 
-/// RenderingContext
-struct Point3 {
-  int x;
-  int y;
-  int z;
-};
-
-/// Vector type for direction
-typedef struct{
-	tinyVec up;
-	tinyVec right;
-	tinyVec forward;
-}DirectionVector;
+#include "src/tiny_math.h"
 
 /// Type of event handled.
 typedef enum {

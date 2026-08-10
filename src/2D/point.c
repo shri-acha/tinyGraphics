@@ -1,4 +1,3 @@
-#include "../graphics.h"
 #include "../_graphics.h"
 
 void renderPoint2D(renderContext *rc, Point2 p,Color color) {

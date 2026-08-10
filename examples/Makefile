@@ -1,28 +1,28 @@
-CFLAGS = -I vendor/fast_obj/
+CFLAGS = -I src/vendor/fast_obj/
 LIBS = -lm -lglfw -lGL
 BUILD_DIR = build/
 
-opengl_prism: opengl_prism.c ../3D/*.c ../2D/*.c ../*.c
+opengl_prism: opengl_prism.c ../src/3D/*.c ../src/2D/*.c ../src/*.c ../src/events/*.c ../src/math/*.c ../src/utils/*.c ../*.c 
 	@mkdir -p $(BUILD_DIR)
-	gcc opengl_prism.c ../2D/*.c ../3D/*.c ../*.c $(CFLAGS) $(LIBS) -o $(BUILD_DIR)/ogl_prism 
+	gcc opengl_prism.c ../src/2D/*.c ../src/events/*.c ../src/math/*.c ../src/utils/*.c ../src/3D/*.c ../src/*.c ../*.c $(CFLAGS) $(LIBS) -o $(BUILD_DIR)/ogl_prism 
 
-opengl_triangle: opengl_triangle.c ../3D/*.c ../2D/*.c ../*.c
+opengl_triangle: opengl_triangle.c ../src/events/*.c ../src/math/*.c ../src/utils/*.c ../src/3D/*.c ../src/2D/*.c ../src/*.c ../*.c 
 	@mkdir -p $(BUILD_DIR)
-	gcc opengl_triangle.c ../2D/*.c ../3D/*.c ../*.c $(CFLAGS) $(LIBS) -o $(BUILD_DIR)/ogl_triangle 
+	gcc opengl_triangle.c ../src/2D/*.c ../src/events/*.c ../src/math/*.c ../src/utils/*.c ../src/3D/*.c ../src/*.c ../*.c  $(CFLAGS) $(LIBS) -o $(BUILD_DIR)/ogl_triangle 
 
-opengl_circle: opengl_circle.c ../3D/*.c ../2D/*.c ../*.c
+opengl_circle: opengl_circle.c ../src/3D/*.c ../src/2D/*.c ../src/*.c ../src/events/*.c ../src/math/*.c ../src/utils/*.c ../*.c 
 	@mkdir -p $(BUILD_DIR)
-	gcc opengl_circle.c ../2D/*.c ../3D/*.c ../*.c $(CFLAGS) $(LIBS) -o $(BUILD_DIR)/ogl_circle 
+	gcc opengl_circle.c ../src/2D/*.c ../src/3D/*.c ../src/events/*.c ../src/math/*.c ../src/utils/*.c ../src/*.c  ../*.c $(CFLAGS) $(LIBS) -o $(BUILD_DIR)/ogl_circle 
 
-opengl_cube: opengl_cube.c ../3D/*.c ../2D/*.c ../*.c
+opengl_cube: opengl_cube.c ../src/3D/*.c ../src/2D/*.c ../src/*.c ../src/events/*.c ../src/math/*.c ../src/utils/*.c ../*.c 
 	@mkdir -p $(BUILD_DIR)
-	gcc opengl_cube.c ../2D/*.c ../3D/*.c ../*.c $(CFLAGS) $(LIBS) -o $(BUILD_DIR)/ogl_cube
+	gcc opengl_cube.c ../src/2D/*.c ../src/3D/*.c ../src/events/*.c ../src/math/*.c ../src/utils/*.c ../src/*.c  ../*.c $(CFLAGS) $(LIBS) -o $(BUILD_DIR)/ogl_cube
 
-opengl_gouraud_cube: opengl_gouraud_cube.c ../3D/*.c ../2D/*.c ../*.c
+opengl_gouraud_cube: opengl_gouraud_cube.c ../src/3D/*.c ../src/2D/*.c ../src/*.c ../src/events/*.c ../src/math/*.c ../src/utils/*.c ../*.c 
 	@mkdir -p $(BUILD_DIR)
-	gcc opengl_gouraud_cube.c ../2D/*.c ../3D/*.c ../*.c $(CFLAGS) $(LIBS) -o $(BUILD_DIR)/ogl_gouraud_cube
+	gcc opengl_gouraud_cube.c ../src/2D/*.c ../src/3D/*.c ../src/*.c ../src/events/*.c ../src/math/*.c ../src/utils/*.c  ../*.c $(CFLAGS) $(LIBS) -o $(BUILD_DIR)/ogl_gouraud_cube
 
 
-opengl_obj: opengl_obj.c ../3D/*.c ../2D/*.c ../*.c
+opengl_obj: opengl_obj.c ../src/3D/*.c ../src/2D/*.c ../src/*.c ../*.c 
 	@mkdir -p $(BUILD_DIR)
-	gcc opengl_obj.c ../2D/*.c ../3D/*.c ../*.c ../vendor/fast_obj/*.c $(CFLAGS) $(LIBS) -o $(BUILD_DIR)/ogl_obj
+	gcc opengl_obj.c ../src/2D/*.c ../src/3D/*.c ../src/*.c ../src/events/*.c ../src/math/*.c ../src/utils/*.c ../src/vendor/fast_obj/*.c ../*.c  $(CFLAGS) $(LIBS) -o $(BUILD_DIR)/ogl_obj

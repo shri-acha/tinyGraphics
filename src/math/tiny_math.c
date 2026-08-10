@@ -1,5 +1,4 @@
-#include "tiny_math.h"
-#include "types.h"
+#include "../tiny_math.h"
 
 tinyMatrix matrixIdentity(void) {
 	return (tinyMatrix){

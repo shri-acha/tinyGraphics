@@ -1,5 +1,5 @@
 #pragma once
-#include "types.h"
+#include "../types.h"
 #include "stdlib.h"
 /*Draws a pixel at the location x,y with z  */
 int _drawPixel(renderContext *rc, int x, int y,int z,Color color);
@@ -30,3 +30,6 @@ void _renderLine3D(renderContext *rc,Point3 p1, Point3 p2,Color color);
 void _renderTriangle3D(renderContext *rc, Point3* points[3],Color color);
 void _renderCircle3D(renderContext *rc, Point3 c,int r,Color color);
 void _renderAngledCircle3D(renderContext *rc, Point3 c,int r,float theta, axis ax,Color color);
+
+void _drawHorizontalLineScreen(renderContext *rc, int x1, int x2,float z1,float z2, int y, Color color);
+void _drawHorizontalLineScreenGouraud(renderContext *rc, int x1, int x2, float z1, float z2, float i1, float i2, int y, Color color);

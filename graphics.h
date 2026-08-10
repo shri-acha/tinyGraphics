@@ -1,9 +1,9 @@
 #pragma once
 #include "types.h"
-#include "utils.h"
-#include "vendor/fast_obj/fast_obj.h"
+#include "./src/utils.h"
+#include "./src/vendor/fast_obj/fast_obj.h"
 #include "./gl_ext.h"
-#include "tiny_math.h"
+#include "./src/tiny_math.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <math.h>

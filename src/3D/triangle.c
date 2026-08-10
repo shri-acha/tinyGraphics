@@ -1,5 +1,4 @@
 #include "../_graphics.h"
-#include "../types.h"
 
 
 void renderTriangle3D(renderContext *rc, Point3 *points[3],Color color) {
