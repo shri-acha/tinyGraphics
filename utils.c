@@ -91,3 +91,15 @@ Color kd_to_color(const float kd[3]) {
     uint16_t b5 = (uint16_t)(clamp01(kd[2]) * 31.0f);
     return (Color){ .literal = (uint16_t)((r5 << 11) | (g6 << 5) | b5) };
 }
+
+Color colorScale(Color c, float intensity) {
+    if (intensity < 0.0f) intensity = 0.0f;
+    if (intensity > 1.0f) intensity = 1.0f;
+    uint16_t r5 = (c.literal >> 11) & 0x1F;
+    uint16_t g6 = (c.literal >>  5) & 0x3F;
+    uint16_t b5 =  c.literal        & 0x1F;
+    r5 = (uint16_t)(r5 * intensity);
+    g6 = (uint16_t)(g6 * intensity);
+    b5 = (uint16_t)(b5 * intensity);
+    return (Color){ .literal = (uint16_t)((r5 << 11) | (g6 << 5) | b5) };
+}

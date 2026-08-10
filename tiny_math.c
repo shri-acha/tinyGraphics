@@ -150,3 +150,39 @@ tinyMatrix getRotationMatrix3D(float theta, axis ax) {
 	return m;
 }
 
+float vecDot3(tinyVec a, tinyVec b) {
+	return a.inner[0] * b.inner[0] +
+	       a.inner[1] * b.inner[1] +
+	       a.inner[2] * b.inner[2];
+}
+
+tinyVec vecCross(tinyVec a, tinyVec b) {
+	return (tinyVec){ .inner = {
+		a.inner[1] * b.inner[2] - a.inner[2] * b.inner[1],
+		a.inner[2] * b.inner[0] - a.inner[0] * b.inner[2],
+		a.inner[0] * b.inner[1] - a.inner[1] * b.inner[0],
+		0.0f
+	}};
+}
+
+tinyVec vecSub(tinyVec a, tinyVec b) {
+	return (tinyVec){ .inner = {
+		a.inner[0] - b.inner[0],
+		a.inner[1] - b.inner[1],
+		a.inner[2] - b.inner[2],
+		0.0f
+	}};
+}
+
+tinyVec vecNormalize(tinyVec v) {
+	float len = sqrtf(v.inner[0] * v.inner[0] +
+	                  v.inner[1] * v.inner[1] +
+	                  v.inner[2] * v.inner[2]);
+	if (len < 0.0001f) return (tinyVec){ .inner = { 0, 0, 0, 0 } };
+	return (tinyVec){ .inner = {
+		v.inner[0] / len,
+		v.inner[1] / len,
+		v.inner[2] / len,
+		0.0f
+	}};
+}

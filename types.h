@@ -110,6 +110,19 @@ typedef enum {
   FILLED,
 } renderMode;
 
+/* Shading model applied on top of the render mode */
+typedef enum {
+  SHADE_NONE,    /* No shading (default) */
+  SHADE_GOURAUD, /* Gouraud (per-vertex) shading */
+} shadingMode;
+
+/* Directional light source for shading */
+typedef struct {
+  tinyVec direction;  /* Unit direction *towards* the light */
+  float ambient;      /* Ambient intensity [0,1] */
+  float diffuse;      /* Diffuse intensity [0,1] */
+} Light;
+
 typedef enum {
 	LINE,
 	CIRCLE,
@@ -166,6 +179,7 @@ typedef enum {
 typedef struct {
   frameBuffer *frame_buffer;
   renderMode render_mode;
+  shadingMode shading_mode;
   projectionMode projection;
   float focal_length;
   Index origin;
@@ -173,4 +187,5 @@ typedef struct {
   DirectionVector camera_direction;
   Point3 camera_position;
   EventHandler event_handler;
+  Light light;
 } renderContext;

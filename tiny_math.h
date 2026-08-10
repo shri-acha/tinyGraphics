@@ -41,3 +41,10 @@ tinyMatrix getTranslationMatrix(float tx, float ty, float tz);
 tinyMatrix getScaleMatrix(float sx, float sy, float sz);
 tinyMatrix getRotationMatrix2D(float theta, axis ax);
 tinyMatrix getRotationMatrix3D(float theta, axis ax);
+
+/* 3-component vector operations (ignores w) */
+float vecDot3(tinyVec a, tinyVec b);
+tinyVec vecCross(tinyVec a, tinyVec b);
+tinyVec vecSub(tinyVec a, tinyVec b);
+tinyVec vecNormalize(tinyVec v);
+

@@ -25,3 +25,6 @@ DirectionVector lookAt(Point3 camera_pos, Point3 target, Vector4 world_up);
 float clamp01(float v);
 
 Color kd_to_color(const float kd[3]);
+
+/* Scale an R5G6B5 color by a float intensity [0,1] */
+Color colorScale(Color c, float intensity);

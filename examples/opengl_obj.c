@@ -20,6 +20,12 @@ int main() {
         .camera_position = (Point3){ .x = 0, .y = 150, .z = 300 },
         .projection = PERSPECTIVE,
         .focal_length = 200.0f,
+        .shading_mode = SHADE_GOURAUD,
+        .light = {
+            .direction = (tinyVec){ .inner = { 1.0f, 1.0f, 1.0f, 0.0f } },
+            .ambient = 0.2f,
+            .diffuse = 0.8f
+        },
     };
 
     if (!glfwInit()) return -1;

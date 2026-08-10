@@ -433,7 +433,7 @@ Point2 _project3D(renderContext* rc, Point3 p,int* depth) {
 
     if (rc->projection == PERSPECTIVE) {
         if (z_cam <= 0.1f) {
-            return (Point2){ .x = -9999, .y = -9999 };
+            return (Point2){ .x = 0, .y = 0 };
         }
 
         float x_proj = (x_cam * rc->focal_length) / z_cam;
@@ -519,6 +519,27 @@ void _drawHorizontalLineScreen(renderContext *rc, int x1, int x2,float z1,float 
   }
 }
 
+void _drawHorizontalLineScreenGouraud(renderContext *rc, int x1, int x2,
+                                       float z1, float z2,
+                                       float i1, float i2,
+                                       int y, Color color) {
+  if (x1 > x2) {
+    int tmpx = x1; x1 = x2; x2 = tmpx;
+    float tmpz = z1; z1 = z2; z2 = tmpz;
+    float tmpi = i1; i1 = i2; i2 = tmpi;
+  }
+  int steps = x2 - x1;
+  float z_inc = (steps != 0) ? (z2 - z1) / (float)steps : 0.0f;
+  float i_inc = (steps != 0) ? (i2 - i1) / (float)steps : 0.0f;
+  float z = z1;
+  float intensity = i1;
+  for (int px = x1; px <= x2; px++) {
+    _drawPixel(rc, px, y, (int)roundf(z), colorScale(color, intensity));
+    z += z_inc;
+    intensity += i_inc;
+  }
+}
+
 void _renderPoint3D(renderContext *rc, Point3 p,Color color) {
 	int depth;
 	Point2 projected = _project3D(rc,p,&depth);
@@ -547,6 +568,33 @@ void _renderTriangle3D(renderContext* rc, Point3 *points[3],Color color){
 				points_2[i] = &tmp_buff[i];
 		 }
 
+		 /* Compute per-vertex Gouraud intensities (or 1.0 when shading is off) */
+		 float vert_intensity[3] = { 1.0f, 1.0f, 1.0f };
+		 int use_gouraud = (rc->shading_mode == SHADE_GOURAUD);
+
+		 if (use_gouraud) {
+			 tinyVec v0 = point3ToVec(*points[0]);
+			 tinyVec v1 = point3ToVec(*points[1]);
+			 tinyVec v2 = point3ToVec(*points[2]);
+			 tinyVec edge1 = vecSub(v1, v0);
+			 tinyVec edge2 = vecSub(v2, v0);
+			 tinyVec face_normal = vecNormalize(vecCross(edge1, edge2));
+
+			 tinyVec light_dir = vecNormalize(rc->light.direction);
+			 float ambient = rc->light.ambient;
+			 float diffuse = rc->light.diffuse;
+
+			 /* Flat-per-vertex: same face normal for all 3 vertices */
+			 float ndotl = vecDot3(face_normal, light_dir);
+			 if (ndotl < 0.0f) ndotl = 0.0f;
+			 float intensity = ambient + diffuse * ndotl;
+			 if (intensity > 1.0f) intensity = 1.0f;
+			 vert_intensity[0] = intensity;
+			 vert_intensity[1] = intensity;
+			 vert_intensity[2] = intensity;
+		 }
+
+		 /* Reorder intensities to match sorted vertex order */
 		 sort_point2(points_2, 3);
 
 		 int idx0 = (int)(points_2[0] - tmp_buff);
@@ -556,66 +604,141 @@ void _renderTriangle3D(renderContext* rc, Point3 *points[3],Color color){
 		 int x1 = points_2[0]->x, y1 = points_2[0]->y, z1 = depth_buff[idx0];
 		 int x2 = points_2[1]->x, y2 = points_2[1]->y, z2 = depth_buff[idx1];
 		 int x3 = points_2[2]->x, y3 = points_2[2]->y, z3 = depth_buff[idx2];
+		 float i1 = vert_intensity[idx0];
+		 float i2 = vert_intensity[idx1];
+		 float i3 = vert_intensity[idx2];
 
 		 int y4 = y2;
 		 int x4 = (y3-y1 != 0)?( x1 + (int)((float)(y4 - y1) * ((float)(x3 - x1) / (float)(y3 - y1))) ):0;
 		 int z4 = (y3-y1 != 0)?( z1 + (int)((float)(y4 - y1) * ((float)(z3 - z1) / (float)(y3 - y1))) ):z1;
+		 float i4 = (y3-y1 != 0)?( i1 + (float)(y4 - y1) * ((i3 - i1) / (float)(y3 - y1)) ):i1;
 
-		 {
-			// TOP HALF
-			  float x_left = (float)x1;
-			  float x_right = (float)x1;
-			  float z_left = (float)z1;
-			  float z_right = (float)z1;
+		 if (use_gouraud) {
+			 // ---- GOURAUD SCANLINE RASTERIZATION ----
+			 {
+				// TOP HALF
+				  float x_left = (float)x1;
+				  float x_right = (float)x1;
+				  float z_left = (float)z1;
+				  float z_right = (float)z1;
+				  float i_left = i1;
+				  float i_right = i1;
 
-			  if ( y2 != y1) {
-			  float change_x_left = (y2 - y1 > 0)?((float)(x2 - x1) / (float)(y2 - y1)):((float)(x4 - x1) / (float)(y1 - y2));
-			  float change_x_right = (y2 - y1 > 0)?((float)(x4 - x1) / (float)(y2 - y1)):((float)(x4 - x1) / (float)(y1 - y2));
-			  float change_z_left = (y2 - y1 > 0)?((float)(z2 - z1) / (float)(y2 - y1)):((float)(z4 - z1) / (float)(y1 - y2));
-			  float change_z_right = (y2 - y1 > 0)?((float)(z4 - z1) / (float)(y2 - y1)):((float)(z4 - z1) / (float)(y1 - y2));
+				  if ( y2 != y1) {
+				  float dy_top = (float)(y2 - y1);
+				  float change_x_left = (float)(x2 - x1) / dy_top;
+				  float change_x_right = (float)(x4 - x1) / dy_top;
+				  float change_z_left = (float)(z2 - z1) / dy_top;
+				  float change_z_right = (float)(z4 - z1) / dy_top;
+				  float change_i_left = (i2 - i1) / dy_top;
+				  float change_i_right = (i4 - i1) / dy_top;
 
-					for (int y_scan = y1; y_scan < y2; y_scan++) {
-						  if (x_left >= x_right) {
-								 _drawHorizontalLineScreen(rc, (int)x_right, (int)x_left, z_right, z_left, y_scan,color);
-						  } else {
-								 _drawHorizontalLineScreen(rc, (int)x_left, (int)x_right, z_left, z_right, y_scan,color);
-						  }
-						  x_left += change_x_left;
-						  x_right += change_x_right;
-						  z_left += change_z_left;
-						  z_right += change_z_right;
-					}
-			  }
-		 }
+						for (int y_scan = y1; y_scan < y2; y_scan++) {
+							  if (x_left >= x_right) {
+									 _drawHorizontalLineScreenGouraud(rc, (int)x_right, (int)x_left, z_right, z_left, i_right, i_left, y_scan, color);
+							  } else {
+									 _drawHorizontalLineScreenGouraud(rc, (int)x_left, (int)x_right, z_left, z_right, i_left, i_right, y_scan, color);
+							  }
+							  x_left += change_x_left;
+							  x_right += change_x_right;
+							  z_left += change_z_left;
+							  z_right += change_z_right;
+							  i_left += change_i_left;
+							  i_right += change_i_right;
+						}
+				  }
+			 }
 
-		 {
-			// BOTTOM HALF
-			  float x_left = (float)x2;
-			  float x_right = (float)x4;
-			  float z_left = (float)z2;
-			  float z_right = (float)z4;
+			 {
+				// BOTTOM HALF
+				  float x_left = (float)x2;
+				  float x_right = (float)x4;
+				  float z_left = (float)z2;
+				  float z_right = (float)z4;
+				  float i_left = i2;
+				  float i_right = i4;
 
-			  if ( y3 != y2) {
-					float change_x_left = (y3-y2 > 0)?((float)(x3 - x2) / (float)(y3 - y2)):((float)(x3 - x2) / (float)(y2 - y3));
-					float change_x_right = (y3-y2 > 0)?((float)(x3 - x4) / (float)(y3 - y2)):((float)(x3 - x2) / (float)(y2 - y3));
-					float change_z_left = (y3-y2 > 0)?((float)(z3 - z2) / (float)(y3 - y2)):((float)(z3 - z2) / (float)(y2 - y3));
-					float change_z_right = (y3-y2 > 0)?((float)(z3 - z4) / (float)(y3 - y2)):((float)(z3 - z2) / (float)(y2 - y3));
+				  if ( y3 != y2) {
+						float dy_bot = (float)(y3 - y2);
+						float change_x_left = (float)(x3 - x2) / dy_bot;
+						float change_x_right = (float)(x3 - x4) / dy_bot;
+						float change_z_left = (float)(z3 - z2) / dy_bot;
+						float change_z_right = (float)(z3 - z4) / dy_bot;
+						float change_i_left = (i3 - i2) / dy_bot;
+						float change_i_right = (i3 - i4) / dy_bot;
 
-					for (int y_scan = y2; y_scan < y3; y_scan++) {
-						 if (x_left >= x_right) {
-							  _drawHorizontalLineScreen(rc, (int)x_right, (int)x_left, z_right, z_left, y_scan,color);
-						 } else {
-							  _drawHorizontalLineScreen(rc, (int)x_left, (int)x_right, z_left, z_right, y_scan,color);
-						 }
-						 x_left += change_x_left;
-						 x_right += change_x_right;
-						 z_left += change_z_left;
-						 z_right += change_z_right;
-					}
-			  }
+						for (int y_scan = y2; y_scan < y3; y_scan++) {
+							 if (x_left >= x_right) {
+								  _drawHorizontalLineScreenGouraud(rc, (int)x_right, (int)x_left, z_right, z_left, i_right, i_left, y_scan, color);
+							 } else {
+								  _drawHorizontalLineScreenGouraud(rc, (int)x_left, (int)x_right, z_left, z_right, i_left, i_right, y_scan, color);
+							 }
+							 x_left += change_x_left;
+							 x_right += change_x_right;
+							 z_left += change_z_left;
+							 z_right += change_z_right;
+							 i_left += change_i_left;
+							 i_right += change_i_right;
+						}
+				  }
+			 }
+		 } else {
+			 // ---- ORIGINAL FLAT SCANLINE RASTERIZATION ----
+			 {
+				// TOP HALF
+				  float x_left = (float)x1;
+				  float x_right = (float)x1;
+				  float z_left = (float)z1;
+				  float z_right = (float)z1;
+
+				  if ( y2 != y1) {
+				  float change_x_left = (y2 - y1 > 0)?((float)(x2 - x1) / (float)(y2 - y1)):((float)(x4 - x1) / (float)(y1 - y2));
+				  float change_x_right = (y2 - y1 > 0)?((float)(x4 - x1) / (float)(y2 - y1)):((float)(x4 - x1) / (float)(y1 - y2));
+				  float change_z_left = (y2 - y1 > 0)?((float)(z2 - z1) / (float)(y2 - y1)):((float)(z4 - z1) / (float)(y1 - y2));
+				  float change_z_right = (y2 - y1 > 0)?((float)(z4 - z1) / (float)(y2 - y1)):((float)(z4 - z1) / (float)(y1 - y2));
+
+						for (int y_scan = y1; y_scan < y2; y_scan++) {
+							  if (x_left >= x_right) {
+									 _drawHorizontalLineScreen(rc, (int)x_right, (int)x_left, z_right, z_left, y_scan,color);
+							  } else {
+									 _drawHorizontalLineScreen(rc, (int)x_left, (int)x_right, z_left, z_right, y_scan,color);
+							  }
+							  x_left += change_x_left;
+							  x_right += change_x_right;
+							  z_left += change_z_left;
+							  z_right += change_z_right;
+						}
+				  }
+			 }
+
+			 {
+				// BOTTOM HALF
+				  float x_left = (float)x2;
+				  float x_right = (float)x4;
+				  float z_left = (float)z2;
+				  float z_right = (float)z4;
+
+				  if ( y3 != y2) {
+						float change_x_left = (y3-y2 > 0)?((float)(x3 - x2) / (float)(y3 - y2)):((float)(x3 - x2) / (float)(y2 - y3));
+						float change_x_right = (y3-y2 > 0)?((float)(x3 - x4) / (float)(y3 - y2)):((float)(x3 - x2) / (float)(y2 - y3));
+						float change_z_left = (y3-y2 > 0)?((float)(z3 - z2) / (float)(y3 - y2)):((float)(z3 - z2) / (float)(y2 - y3));
+						float change_z_right = (y3-y2 > 0)?((float)(z3 - z4) / (float)(y3 - y2)):((float)(z3 - z2) / (float)(y2 - y3));
+
+						for (int y_scan = y2; y_scan < y3; y_scan++) {
+							 if (x_left >= x_right) {
+								  _drawHorizontalLineScreen(rc, (int)x_right, (int)x_left, z_right, z_left, y_scan,color);
+							 } else {
+								  _drawHorizontalLineScreen(rc, (int)x_left, (int)x_right, z_left, z_right, y_scan,color);
+							 }
+							 x_left += change_x_left;
+							 x_right += change_x_right;
+							 z_left += change_z_left;
+							 z_right += change_z_right;
+						}
+				  }
+			 }
 		 }
 		 break;
 	}
     }
 }
-

@@ -18,6 +18,11 @@ opengl_cube: opengl_cube.c ../3D/*.c ../2D/*.c ../*.c
 	@mkdir -p $(BUILD_DIR)
 	gcc opengl_cube.c ../2D/*.c ../3D/*.c ../*.c $(CFLAGS) $(LIBS) -o $(BUILD_DIR)/ogl_cube
 
+opengl_gouraud_cube: opengl_gouraud_cube.c ../3D/*.c ../2D/*.c ../*.c
+	@mkdir -p $(BUILD_DIR)
+	gcc opengl_gouraud_cube.c ../2D/*.c ../3D/*.c ../*.c $(CFLAGS) $(LIBS) -o $(BUILD_DIR)/ogl_gouraud_cube
+
+
 opengl_obj: opengl_obj.c ../3D/*.c ../2D/*.c ../*.c
 	@mkdir -p $(BUILD_DIR)
 	gcc opengl_obj.c ../2D/*.c ../3D/*.c ../*.c ../vendor/fast_obj/*.c $(CFLAGS) $(LIBS) -o $(BUILD_DIR)/ogl_obj
