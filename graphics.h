@@ -1,5 +1,6 @@
 #pragma once
 #include "types.h"
+#include "window.h"
 #include "./src/utils.h"
 #include "./src/events.h"
 #include "./src/vendor/fast_obj/fast_obj.h"
