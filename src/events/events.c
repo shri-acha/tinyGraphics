@@ -5,10 +5,6 @@
 #include <GLFW/glfw3.h>
 #endif
 
-/* ========================================================================= */
-/* Ring Buffer Operations                                                    */
-/* ========================================================================= */
-
 void ringBufferInit(EventRingBuffer *rb) {
     if (!rb) return;
     rb->head = 0;
@@ -61,10 +57,6 @@ void ringBufferClear(EventRingBuffer *rb) {
     rb->count = 0;
 }
 
-/* ========================================================================= */
-/* Render Context Event Operations                                           */
-/* ========================================================================= */
-
 void initEventContext(renderContext *rc) {
     if (!rc) return;
     ringBufferInit(&rc->event_queue);
@@ -94,10 +86,6 @@ void registerEventHandler(renderContext *rc, void (*handler)(Event e)) {
     if (!rc) return;
     rc->event_handler.f = handler;
 }
-
-/* ========================================================================= */
-/* GLFW Event Integration                                                    */
-/* ========================================================================= */
 
 #ifdef TINY_HAS_GLFW
 
@@ -134,7 +122,6 @@ void glfwCursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
     (void)window;
     (void)xpos;
     (void)ypos;
-    /* Optional: can track continuous cursor motion if needed */
 }
 
 void registerGLFWCallbacks(GLFWwindow* window, renderContext* rc) {
