@@ -45,9 +45,20 @@ Point2 _project3D(renderContext* rc, Point3 p,int* depth) {
     float py = (float)p.y - (float)rc->camera_position.y;
     float pz = (float)p.z - (float)rc->camera_position.z;
 
-    float* r = rc->camera_direction.right.inner;
-    float* u = rc->camera_direction.up.inner;
-    float* f = rc->camera_direction.forward.inner;
+    static const float default_r[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
+    static const float default_u[4] = { 0.0f, 1.0f, 0.0f, 0.0f };
+    static const float default_f[4] = { 0.0f, 0.0f, -1.0f, 0.0f };
+
+    const float* r = rc->camera_direction.right.inner;
+    const float* u = rc->camera_direction.up.inner;
+    const float* f = rc->camera_direction.forward.inner;
+
+    if (f[0] == 0.0f && f[1] == 0.0f && f[2] == 0.0f &&
+        r[0] == 0.0f && r[1] == 0.0f && r[2] == 0.0f) {
+        r = default_r;
+        u = default_u;
+        f = default_f;
+    }
 
     float x_cam = r[0] * px + r[1] * py + r[2] * pz;
     float y_cam = u[0] * px + u[1] * py + u[2] * pz;
@@ -82,7 +93,7 @@ int _drawPixel(renderContext *rc, int x, int y, int z, Color color) {
   int width = rc->frame_buffer->width;
   int height = rc->frame_buffer->height;
 
-  if (x > width || y > height || x < 0 || y < 0) {
+  if (x >= width || y >= height || x < 0 || y < 0) {
     return -1;
   }
   int idx = get_index(rc->frame_buffer, x, y);

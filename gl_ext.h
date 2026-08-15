@@ -32,6 +32,8 @@
 /* Draws a screen-filling quad textured with frameBuffer */
 #ifndef TINY_GL_DRAW_QUAD
 #define TINY_GL_DRAW_QUAD() do { \
+    glEnable(GL_TEXTURE_2D); \
+    glColor3f(1.0f, 1.0f, 1.0f); \
     glBegin(GL_QUADS); \
         glTexCoord2f(0.0f, 1.0f); glVertex2f(-1.0f, -1.0f); \
         glTexCoord2f(1.0f, 1.0f); glVertex2f( 1.0f, -1.0f); \
@@ -41,9 +43,16 @@
 } while(0)
 #endif
 
+/* Registers GLFW event callbacks with renderContext event queue */
+#ifndef TINY_GL_REGISTER_EVENTS
+#define TINY_GL_REGISTER_EVENTS(window, rc_ptr) do { \
+    registerGLFWCallbacks((window), (rc_ptr)); \
+} while(0)
+#endif
+
 /* 
  * Full per-frame presentation macro:
- * Updates GL texture, clears screen, draws quad, swaps buffers, polls events, and flushes frameBuffer & sceneContext.
+ * Updates GL texture, clears screen, draws quad, swaps buffers, polls events, processes events, and flushes frameBuffer & sceneContext.
  */
 #ifndef TINY_GL_PRESENT
 #define TINY_GL_PRESENT(window, fb, rc_ptr, tex_id) do { \
@@ -52,6 +61,9 @@
     TINY_GL_DRAW_QUAD(); \
     glfwSwapBuffers((window)); \
     glfwPollEvents(); \
+    if ((rc_ptr) && (rc_ptr)->event_handler.f) { \
+        processEvents((rc_ptr)); \
+    } \
     flushPixelBuffer((fb)->buffer, (fb)->width, (fb)->height); \
     if ((fb)->depth_buffer) { \
         flushDepthBuffer((fb)->depth_buffer, (fb)->width, (fb)->height); \

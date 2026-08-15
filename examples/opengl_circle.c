@@ -11,6 +11,7 @@ int main() {
         .origin = (Index){ .x = 800, .y = 800, .z = 0 },
         .scene_context = newSceneContext(),
         .camera_position = (Point3){ .x = 0, .y = 150, .z = 300 },
+		.shading_mode = SHADE_GOURAUD,
         .projection = PERSPECTIVE,
         .focal_length = 200.0f,
     };

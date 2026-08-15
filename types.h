@@ -48,6 +48,20 @@ typedef struct {
 	void (*f) (Event e);
 }EventHandler;
 
+#ifndef EVENT_BUFFER_CAPACITY
+#define EVENT_BUFFER_CAPACITY 256
+#endif
+
+/// Ring buffer for buffering input events on the render side
+typedef struct {
+	Event events[EVENT_BUFFER_CAPACITY];
+	int head;   // write index
+	int tail;   // read index
+	int count;  // number of events currently in buffer
+} EventRingBuffer;
+
+typedef EventRingBuffer EventQueue;
+
 /// Vector4 is an internal struct representation used for storing 3D
 /// point with scale value 'w'.
 typedef tinyVec Vector4;
@@ -165,5 +179,6 @@ typedef struct {
   DirectionVector camera_direction;
   Point3 camera_position;
   EventHandler event_handler;
+  EventRingBuffer event_queue;
   Light light;
 } renderContext;
