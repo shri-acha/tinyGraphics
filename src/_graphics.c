@@ -107,15 +107,30 @@ int _drawPixel(renderContext *rc, int x, int y, int z, Color color) {
   return 0;
 }
 
-void _drawHorizontalLineScreen(renderContext *rc, int x1, int x2,float z1,float z2, int y, Color color)  {
-	if (x1 > x2) {
-		int tmpx = x1; x1 = x2; x2 = tmpx;
+void _drawHorizontalLineScreen(renderContext *rc, int x1, int x2, float z1, float z2, int y, Color color) {
+  if (y < 0 || y >= rc->frame_buffer->height) return;
+  if (x1 > x2) {
+    int tmpx = x1; x1 = x2; x2 = tmpx;
     float tmpz = z1; z1 = z2; z2 = tmpz;
   }
+  int width = rc->frame_buffer->width;
+  if (x2 < 0 || x1 >= width) return;
+
   int steps = x2 - x1;
   float z_inc = (steps != 0) ? (z2 - z1) / (float)steps : 0.0f;
   float z = z1;
-  for (int i = x1; i <= x2; i++) {
+  int start_x = x1;
+  int end_x = x2;
+
+  if (start_x < 0) {
+    z += (float)(0 - start_x) * z_inc;
+    start_x = 0;
+  }
+  if (end_x >= width) {
+    end_x = width - 1;
+  }
+
+  for (int i = start_x; i <= end_x; i++) {
     _drawPixel(rc, i, y, (int)roundf(z), color);
     z += z_inc;
   }
@@ -125,17 +140,34 @@ void _drawHorizontalLineScreenGouraud(renderContext *rc, int x1, int x2,
                                        float z1, float z2,
                                        float i1, float i2,
                                        int y, Color color) {
+  if (y < 0 || y >= rc->frame_buffer->height) return;
   if (x1 > x2) {
     int tmpx = x1; x1 = x2; x2 = tmpx;
     float tmpz = z1; z1 = z2; z2 = tmpz;
     float tmpi = i1; i1 = i2; i2 = tmpi;
   }
+  int width = rc->frame_buffer->width;
+  if (x2 < 0 || x1 >= width) return;
+
   int steps = x2 - x1;
   float z_inc = (steps != 0) ? (z2 - z1) / (float)steps : 0.0f;
   float i_inc = (steps != 0) ? (i2 - i1) / (float)steps : 0.0f;
   float z = z1;
   float intensity = i1;
-  for (int px = x1; px <= x2; px++) {
+  int start_x = x1;
+  int end_x = x2;
+
+  if (start_x < 0) {
+    float skip = (float)(0 - start_x);
+    z += skip * z_inc;
+    intensity += skip * i_inc;
+    start_x = 0;
+  }
+  if (end_x >= width) {
+    end_x = width - 1;
+  }
+
+  for (int px = start_x; px <= end_x; px++) {
     _drawPixel(rc, px, y, (int)roundf(z), colorScale(color, intensity));
     z += z_inc;
     intensity += i_inc;

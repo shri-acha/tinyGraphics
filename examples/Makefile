@@ -21,7 +21,7 @@ opengl_cube: opengl_cube.c ../src/3D/*.c ../src/2D/*.c ../src/*.c ../src/events/
 
 opengl_obj: opengl_obj.c ../src/3D/*.c ../src/2D/*.c ../src/*.c ../*.c 
 	@mkdir -p $(BUILD_DIR)
-	gcc opengl_obj.c ../src/2D/*.c ../src/3D/*.c ../src/*.c ../src/events/*.c ../src/math/*.c ../src/utils/*.c ../src/vendor/fast_obj/*.c ../*.c  $(CFLAGS) $(LIBS) -o $(BUILD_DIR)/ogl_obj
+	gcc -O3 opengl_obj.c ../src/2D/*.c ../src/3D/*.c ../src/*.c ../src/events/*.c ../src/math/*.c ../src/utils/*.c ../src/vendor/fast_obj/*.c ../*.c  $(CFLAGS) $(LIBS) -o $(BUILD_DIR)/ogl_obj
 
 opengl_events: opengl_events.c ../src/3D/*.c ../src/2D/*.c ../src/*.c ../src/events/*.c ../src/math/*.c ../src/utils/*.c ../*.c
 	@mkdir -p $(BUILD_DIR)

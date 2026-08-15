@@ -27,6 +27,13 @@ void _renderTriangle2D(renderContext* rc, Point2 *points[3],Color color){
 		  int y4 = y2; // USING FOR MY SANITY'S SAKE
         int x4 = x1 + (int)((float)(y4 - y1) * ((float)(x3 - x1) / (float)(y3 - y1)));
 
+        int fb_w = rc->frame_buffer->width;
+        int fb_h = rc->frame_buffer->height;
+        if (y3 < 0 || y1 >= fb_h) break;
+        int min_x = x1; if (x2 < min_x) min_x = x2; if (x3 < min_x) min_x = x3; if (x4 < min_x) min_x = x4;
+        int max_x = x1; if (x2 > max_x) max_x = x2; if (x3 > max_x) max_x = x3; if (x4 > max_x) max_x = x4;
+        if (max_x < 0 || min_x >= fb_w) break;
+
 		  // USES THE DDA TO RENDER EACH LINE 
 				{
 			  // TOP HALF
@@ -36,7 +43,17 @@ void _renderTriangle2D(renderContext* rc, Point2 *points[3],Color color){
 				float change_x_left = (y2 - y1 != 0) ? (float)(x2 - x1) / (float)(y2 - y1) : 0.0f;
 				float change_x_right = (y2 - y1 != 0) ? (float)(x4 - x1) / (float)(y2 - y1) : 0.0f;
 
-            for (int y_scan = y1; y_scan <= y2; y_scan++) {
+            int start_y = y1;
+            int end_y = y2;
+            if (start_y < 0) {
+                float skip = (float)(0 - start_y);
+                x_left += change_x_left * skip;
+                x_right += change_x_right * skip;
+                start_y = 0;
+            }
+            if (end_y > fb_h) end_y = fb_h;
+
+            for (int y_scan = start_y; y_scan <= end_y; y_scan++) {
                 if (x_left >= x_right) {
                     _renderHorizontalLine2D(rc, (int)x_right, (int)x_left, y_scan,color);
                 } else {
@@ -56,7 +73,17 @@ void _renderTriangle2D(renderContext* rc, Point2 *points[3],Color color){
             float change_x_left = (y3-y2 != 0)?((float)(x3 - x2) / (float)(y3 - y2)):0.0f;
             float change_x_right = (y3-y2 != 0)?((float)(x3 - x4) / (float)(y3 - y2)):0.0f;
 
-            for (int y_scan = y2; y_scan < y3; y_scan++) {
+            int start_y = y2;
+            int end_y = y3;
+            if (start_y < 0) {
+                float skip = (float)(0 - start_y);
+                x_left += change_x_left * skip;
+                x_right += change_x_right * skip;
+                start_y = 0;
+            }
+            if (end_y > fb_h) end_y = fb_h;
+
+            for (int y_scan = start_y; y_scan < end_y; y_scan++) {
                 if (x_left >= x_right) {
                     _renderHorizontalLine2D(rc, (int)x_right, (int)x_left, y_scan,color);
                 } else {

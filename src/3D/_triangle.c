@@ -16,10 +16,13 @@ void _renderTriangle3D(renderContext* rc, Point3 *points[3],Color color){
     }
 	case FILLED: {
 		 int depth_buff[3];
+		 int behind_count = 0;
 		 for (int i=0;i<3;i++) {
 				tmp_buff[i] = _project3D(rc, *points[i], &depth_buff[i]);
+				if (depth_buff[i] <= 0) behind_count++;
 				points_2[i] = &tmp_buff[i];
 		 }
+		 if (behind_count == 3) break;
 
 		 /* Compute per-vertex Gouraud intensities (or 1.0 when shading is off) */
 		 float vert_intensity[3] = { 1.0f, 1.0f, 1.0f };
@@ -65,6 +68,13 @@ void _renderTriangle3D(renderContext* rc, Point3 *points[3],Color color){
 		 int z4 = (y3-y1 != 0)?( z1 + (int)((float)(y4 - y1) * ((float)(z3 - z1) / (float)(y3 - y1))) ):z1;
 		 float i4 = (y3-y1 != 0)?( i1 + (float)(y4 - y1) * ((i3 - i1) / (float)(y3 - y1)) ):i1;
 
+		 int fb_w = rc->frame_buffer->width;
+		 int fb_h = rc->frame_buffer->height;
+		 if (y3 < 0 || y1 >= fb_h) break;
+		 int min_x = x1; if (x2 < min_x) min_x = x2; if (x3 < min_x) min_x = x3; if (x4 < min_x) min_x = x4;
+		 int max_x = x1; if (x2 > max_x) max_x = x2; if (x3 > max_x) max_x = x3; if (x4 > max_x) max_x = x4;
+		 if (max_x < 0 || min_x >= fb_w) break;
+
 		 if (rc->shading_mode == SHADE_GOURAUD) {
 			 // ---- GOURAUD SCANLINE RASTERIZATION ----
 			 {
@@ -77,7 +87,7 @@ void _renderTriangle3D(renderContext* rc, Point3 *points[3],Color color){
 				  float i_right = i1;
 
 				  if ( y2 != y1) {
-				  float dy_top = (float)(y2 - y1);
+				  float dy_top = ((float)(y2 - y1)>= 0.01f)?(y2-y1):0.01f;
 				  float change_x_left = (float)(x2 - x1) / dy_top;
 				  float change_x_right = (float)(x4 - x1) / dy_top;
 				  float change_z_left = (float)(z2 - z1) / dy_top;
@@ -85,7 +95,21 @@ void _renderTriangle3D(renderContext* rc, Point3 *points[3],Color color){
 				  float change_i_left = (i2 - i1) / dy_top;
 				  float change_i_right = (i4 - i1) / dy_top;
 
-						for (int y_scan = y1; y_scan < y2; y_scan++) {
+						int start_y = y1;
+						int end_y = y2;
+						if (start_y < 0) {
+							float skip = (float)(0 - start_y);
+							x_left += change_x_left * skip;
+							x_right += change_x_right * skip;
+							z_left += change_z_left * skip;
+							z_right += change_z_right * skip;
+							i_left += change_i_left * skip;
+							i_right += change_i_right * skip;
+							start_y = 0;
+						}
+						if (end_y > fb_h) end_y = fb_h;
+
+						for (int y_scan = start_y; y_scan < end_y; y_scan++) {
 							  if (x_left >= x_right) {
 									 _drawHorizontalLineScreenGouraud(rc, (int)x_right, (int)x_left, z_right, z_left, i_right, i_left, y_scan, color);
 							  } else {
@@ -119,7 +143,21 @@ void _renderTriangle3D(renderContext* rc, Point3 *points[3],Color color){
 						float change_i_left = (i3 - i2) / dy_bot;
 						float change_i_right = (i3 - i4) / dy_bot;
 
-						for (int y_scan = y2; y_scan < y3; y_scan++) {
+						int start_y = y2;
+						int end_y = y3;
+						if (start_y < 0) {
+							float skip = (float)(0 - start_y);
+							x_left += change_x_left * skip;
+							x_right += change_x_right * skip;
+							z_left += change_z_left * skip;
+							z_right += change_z_right * skip;
+							i_left += change_i_left * skip;
+							i_right += change_i_right * skip;
+							start_y = 0;
+						}
+						if (end_y > fb_h) end_y = fb_h;
+
+						for (int y_scan = start_y; y_scan < end_y; y_scan++) {
 							 if (x_left >= x_right) {
 								  _drawHorizontalLineScreenGouraud(rc, (int)x_right, (int)x_left, z_right, z_left, i_right, i_left, y_scan, color);
 							 } else {
@@ -149,7 +187,19 @@ void _renderTriangle3D(renderContext* rc, Point3 *points[3],Color color){
 				  float change_z_left = (y2 - y1 > 0)?((float)(z2 - z1) / (float)(y2 - y1)):((float)(z4 - z1) / (float)(y1 - y2));
 				  float change_z_right = (y2 - y1 > 0)?((float)(z4 - z1) / (float)(y2 - y1)):((float)(z4 - z1) / (float)(y1 - y2));
 
-						for (int y_scan = y1; y_scan < y2; y_scan++) {
+						int start_y = y1;
+						int end_y = y2;
+						if (start_y < 0) {
+							float skip = (float)(0 - start_y);
+							x_left += change_x_left * skip;
+							x_right += change_x_right * skip;
+							z_left += change_z_left * skip;
+							z_right += change_z_right * skip;
+							start_y = 0;
+						}
+						if (end_y > fb_h) end_y = fb_h;
+
+						for (int y_scan = start_y; y_scan < end_y; y_scan++) {
 							  if (x_left >= x_right) {
 									 _drawHorizontalLineScreen(rc, (int)x_right, (int)x_left, z_right, z_left, y_scan,color);
 							  } else {
@@ -176,7 +226,19 @@ void _renderTriangle3D(renderContext* rc, Point3 *points[3],Color color){
 						float change_z_left = (y3-y2 > 0)?((float)(z3 - z2) / (float)(y3 - y2)):((float)(z3 - z2) / (float)(y2 - y3));
 						float change_z_right = (y3-y2 > 0)?((float)(z3 - z4) / (float)(y3 - y2)):((float)(z3 - z2) / (float)(y2 - y3));
 
-						for (int y_scan = y2; y_scan < y3; y_scan++) {
+						int start_y = y2;
+						int end_y = y3;
+						if (start_y < 0) {
+							float skip = (float)(0 - start_y);
+							x_left += change_x_left * skip;
+							x_right += change_x_right * skip;
+							z_left += change_z_left * skip;
+							z_right += change_z_right * skip;
+							start_y = 0;
+						}
+						if (end_y > fb_h) end_y = fb_h;
+
+						for (int y_scan = start_y; y_scan < end_y; y_scan++) {
 							 if (x_left >= x_right) {
 								  _drawHorizontalLineScreen(rc, (int)x_right, (int)x_left, z_right, z_left, y_scan,color);
 							 } else {

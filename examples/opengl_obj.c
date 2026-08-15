@@ -148,7 +148,10 @@ int main() {
         renderLine3D(&rc, (Point3){ .x = 0, .y = 0, .z = -400 }, (Point3){ .x = 0, .y = 0, .z = 400 }, grid_color);
 
 		for (int i=0;i<10;i++){
-			renderMesh3D(&rc, chicken_mesh, (Point3) {.x = chicken_mesh_offset.x +50*i,.y= chicken_mesh_offset.y+ 50*i, .z=chicken_mesh_offset.z + 50*i }, mesh_color, 1.0f);
+			renderMesh3D(&rc, chicken_mesh, (Point3) {.x = chicken_mesh_offset.x,.y= chicken_mesh_offset.y, .z=chicken_mesh_offset.z + 50*i }, mesh_color, 1.0f);
+		}
+		for (int i=0;i<10;i++){
+			renderMesh3D(&rc, chicken_mesh, (Point3) {.x = chicken_mesh_offset.x + 50*i,.y= chicken_mesh_offset.y, .z=chicken_mesh_offset.z }, mesh_color, 1.0f);
 		}
         // renderMesh3D(&rc, couch_mesh, couch_mesh_offset, mesh_color, 1.5f);
 
