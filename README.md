@@ -2,7 +2,7 @@
 
 A lightweight, dependency-light 2D/3D software rendering engine written in C.
 
-## Overview & Design Philosophy
+## Overview
 
 **tinyGraphics** is designed as a portable, pure CPU software rasterization library. Its primary goal is to bring real-time 2D and 3D rendering capabilities to low-performance CPUs, embedded systems, and resource-constrained microcontrollers without relying on hardware GPU acceleration.
 
@@ -44,6 +44,10 @@ int main(void) {
     return 0;
 }
 ```
+## Use of AI and LLMs
+
+The initial draft and development of AI was purely out of textbook knowledge. Now that I've decided to add more features and make it more approachable, I've decided to use
+LLMs in generating docs, refactoring, code review and suggestions.  
 
 ## Preview
 
