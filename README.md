@@ -46,7 +46,7 @@ int main(void) {
 ```
 ## Use of AI and LLMs
 
-The initial draft and development of AI was purely out of textbook knowledge. Now that I've decided to add more features and make it more approachable, I've decided to use
+The initial draft and development was purely out of textbook knowledge. Now that I've decided to add more features and make it more approachable, I've decided to use
 LLMs in generating docs, refactoring, code review and suggestions.  
 
 ## Preview
