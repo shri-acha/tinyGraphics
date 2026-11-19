@@ -3,7 +3,12 @@
 #include "window.h"
 #include "./src/utils.h"
 #include "./src/events.h"
-#include "./src/vendor/fast_obj/fast_obj.h"
+#if !defined(TINY_NO_FAST_OBJ) && defined(__has_include)
+#  if __has_include("./src/vendor/fast_obj/fast_obj.h")
+#    include "./src/vendor/fast_obj/fast_obj.h"
+#    define TINY_HAS_FAST_OBJ 1
+#  endif
+#endif
 #include "./gl_ext.h"
 #include "./src/tiny_math.h"
 #include <stdint.h>
@@ -101,4 +106,6 @@ Point2 rotatePoint2D(renderContext* rc,int x, int y, float theta, axis ax);
 /* Allocates and initializes a new sceneContext with a list of renderedObjects */
 sceneContext* newSceneContext();
 
+#ifdef TINY_HAS_FAST_OBJ
 void renderMesh3D(renderContext *rc, fastObjMesh *mesh, Point3 offset, Color color, float scale);
+#endif

@@ -6,8 +6,12 @@
 #include <string.h>
 #include <stdio.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 #if defined(__has_include)
-#  if __has_include(<GLFW/glfw3.h>)
+#  if __has_include(<GLFW/glfw3.h>) && !defined(__EMSCRIPTEN__)
 #    include <GLFW/glfw3.h>
 #    define TINY_HAS_GLFW 1
 #  endif
@@ -276,7 +280,9 @@ tinyWindow* tinyCreateWindow(const tinyWindowBackend* backend, int width, int he
     if (!win) return NULL;
 
     if (!backend) {
-#ifdef TINY_HAS_GLFW
+#if defined(__EMSCRIPTEN__)
+        backend = tinyGetWasmBackend();
+#elif defined(TINY_HAS_GLFW)
         backend = tinyGetGLFWBackend();
 #else
         backend = tinyGetCustomBackend();
@@ -337,4 +343,39 @@ void tinyDestroyWindow(tinyWindow* win) {
         win->backend->destroy(win);
     }
     free(win);
+}
+
+typedef struct {
+    tinyWindow* win;
+    void (*frame)(tinyWindow*, void*);
+    void* arg;
+} tinyLoopState;
+
+#ifdef __EMSCRIPTEN__
+static void tiny_loop_trampoline(void* p) {
+    tinyLoopState* st = (tinyLoopState*)p;
+    if (tinyWindowShouldClose(st->win)) {
+        emscripten_cancel_main_loop();
+        return;
+    }
+    st->frame(st->win, st->arg);
+    tinyWindowPresent(st->win);
+}
+#endif
+
+void tinyWindowRunLoop(tinyWindow* win, void (*frame)(tinyWindow*, void*), void* arg) {
+    if (!win || !frame) return;
+#ifdef __EMSCRIPTEN__
+    static tinyLoopState st;
+    st.win = win;
+    st.frame = frame;
+    st.arg = arg;
+    /* fps = 0 -> driven by requestAnimationFrame; 1 -> never returns */
+    emscripten_set_main_loop_arg(tiny_loop_trampoline, &st, 0, 1);
+#else
+    while (!tinyWindowShouldClose(win)) {
+        frame(win, arg);
+        tinyWindowPresent(win);
+    }
+#endif
 }
