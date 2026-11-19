@@ -48,9 +48,7 @@ int destroyContext(renderContext* rc) {
 		free(rc);
 	}else {
 		sceneContext* sc = rc->scene_context;
-		for (int i=0;i<sc->no_of_objs;i++) {
-			free(sc->objs);
-		}
+		free(sc->objs);
 
 		destroyFrameBuffer(rc->frame_buffer);
 		free(rc);
@@ -120,6 +118,7 @@ int drawPixel(renderContext *rc, int x, int y, Color color) {
   return 0;
 }
 
+#ifdef TINY_HAS_FAST_OBJ
 static int obj_to_world(float v, float scale, int offset) {
     return (int)lroundf(v * scale) + offset;
 }
@@ -162,3 +161,4 @@ void renderMesh3D(renderContext *rc, fastObjMesh *mesh, Point3 offset, Color col
         idx_offset += fv;
     }
 }
+#endif /* TINY_HAS_FAST_OBJ */

@@ -44,6 +44,37 @@ int main(void) {
     return 0;
 }
 ```
+## WebAssembly
+
+tinyGraphics runs in the browser through Emscripten. All rasterization still happens on the CPU inside the WASM module. The `tinyGetWasmBackend()` window backend only converts the RGB565 framebuffer to RGBA and blits it onto `<canvas id="canvas">`. Keyboard and mouse events are forwarded into the regular event queue.
+
+Browsers can't run a blocking `while` loop, so use the portable `tinyWindowRunLoop()`. Natively it is a plain loop. On the web it maps to `requestAnimationFrame`:
+
+```c
+static void frame(tinyWindow* win, void* arg) {
+    renderContext* rc = arg;
+    /* draw with renderTriangle2D / renderCircle2D / ... */
+}
+
+int main(void) {
+    /* ... create frameBuffer + renderContext rc ... */
+    tinyWindow* win = tinyCreateWindow(NULL, 480, 270, "demo", &rc, NULL); /* NULL -> WASM backend on the web */
+    tinyWindowRunLoop(win, frame, &rc);
+}
+```
+
+Try the low-poly aquarium demo (`examples/wasm_fishes.c`). It is live at **https://shri-acha.github.io/tinyGraphics/**, and you can build it locally with:
+
+```sh
+source /path/to/emsdk/emsdk_env.sh      # or: nix-shell -p emscripten
+cd examples
+make wasm_fishes                        # -> build/web/{index.html,fishes.js,fishes.wasm}
+python3 -m http.server -d build/web 8000
+# open http://localhost:8000
+```
+
+`make native_fishes` builds the same source against GLFW. Pass `-DTINY_NO_FAST_OBJ` to build without the optional `fast_obj` OBJ loader (and `renderMesh3D`).
+
 ## Use of AI and LLMs
 
 The initial draft and development was purely out of textbook knowledge. Now that I've decided to add more features and make it more approachable, I've decided to use

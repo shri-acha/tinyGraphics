@@ -46,6 +46,14 @@ void tinyWindowPresent(tinyWindow* win);
 
 void tinyDestroyWindow(tinyWindow* win);
 
+/**
+ * Portable main loop. Calls frame(win, arg) and then tinyWindowPresent(win)
+ * once per frame until the window closes.
+ * Native builds run a blocking while-loop. Emscripten builds hand control to
+ * the browser (requestAnimationFrame) and never return.
+ */
+void tinyWindowRunLoop(tinyWindow* win, void (*frame)(tinyWindow* win, void* arg), void* arg);
+
 void tinyPushEvent(renderContext* rc, Event ev);
 
 void tinyPushKeyEvent(renderContext* rc, int keycode, KeyState state);
@@ -58,6 +66,11 @@ const tinyWindowBackend* tinyGetGLFWBackend(void);
 const tinyWindowBackend* tinyGetCustomBackend(void);
 
 const tinyWindowBackend* tinyGetTerminalBackend(void);
+
+#ifdef __EMSCRIPTEN__
+/* Presents the frameBuffer on the HTML <canvas id="canvas"> element. */
+const tinyWindowBackend* tinyGetWasmBackend(void);
+#endif
 
 #ifdef __cplusplus
 }

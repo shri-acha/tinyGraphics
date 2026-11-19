@@ -2,7 +2,7 @@
 #include "../types.h"
 
 #if defined(__has_include)
-#  if __has_include(<GLFW/glfw3.h>)
+#  if __has_include(<GLFW/glfw3.h>) && !defined(__EMSCRIPTEN__)
 #    include <GLFW/glfw3.h>
 #    define TINY_HAS_GLFW 1
 #  endif

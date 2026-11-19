@@ -24,3 +24,22 @@ opengl_obj: opengl_obj.c $(SRC_FILES)
 	@mkdir -p $(BUILD_DIR)
 	gcc -O3 opengl_obj.c $(SRC_FILES) ../src/vendor/fast_obj/*.c $(CFLAGS) $(LIBS) -o $(BUILD_DIR)/ogl_obj
 
+
+# ---------------------------------------------------------------------------
+# WebAssembly (requires emsdk: `source /path/to/emsdk/emsdk_env.sh`)
+# ---------------------------------------------------------------------------
+EMCC ?= emcc
+WASM_FLAGS = -O3 -DTINY_NO_FAST_OBJ -sALLOW_MEMORY_GROWTH=1 -sEXPORTED_RUNTIME_METHODS=HEAPU8 -lm
+
+wasm_fishes: wasm_fishes.c web/index.html $(SRC_FILES)
+	@mkdir -p $(BUILD_DIR)/web
+	$(EMCC) wasm_fishes.c $(SRC_FILES) $(WASM_FLAGS) -o $(BUILD_DIR)/web/fishes.js
+	cp web/index.html $(BUILD_DIR)/web/index.html
+	@echo "Serve with: python3 -m http.server -d $(BUILD_DIR)/web 8000"
+
+# Same demo, native window (GLFW)
+native_fishes: wasm_fishes.c $(SRC_FILES)
+	@mkdir -p $(BUILD_DIR)
+	gcc -O3 wasm_fishes.c $(SRC_FILES) -DTINY_NO_FAST_OBJ $(LIBS) -o $(BUILD_DIR)/fishes
+
+.PHONY: wasm_fishes native_fishes
